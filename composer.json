@@ -1,0 +1,21 @@
+{
+    "name": "finaldream/wordpress-easy-301-redirects",
+    "description": "Modern and Easy 301 redirects for Wordpress",
+    "type": "wordpress-plugin",
+    "license": "MIT",
+    "authors": [
+      {
+        "name": "Oliver Erdmann",
+        "email": "o.erdmann@finaldream.de"
+      },
+      {
+        "name": "Carlos González Rico",
+        "email": "carlos@gonzalezri.co"
+      }
+    ],
+    "autoload": {
+      "psr-4": {
+        "": ""
+      }
+    }
+  }
