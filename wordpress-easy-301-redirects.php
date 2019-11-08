@@ -15,11 +15,16 @@ class Easy301RedirectsPlugin {
     public function __construct()
     {
         add_action('init', array($this,'redirect'), 1);
-        add_action( 'admin_menu', array( $this, 'initAdminSettings' ) );
+        add_action('admin_enqueue_scripts', [ $this, 'loadReactRedirectManager' ]);
+        add_action( 'admin_menu', [ $this, 'initAdminSettings' ] );
     }
 
     public function initAdminSettings() {
         add_options_page('Easy 301 Redirects', 'Easy 301 Redirects', 'manage_options', 'easy301options', [$this,'displaySettingsPage']);
+    }
+
+    public function loadReactRedirectManager() {
+        wp_enqueue_script('reactRedirectManager', plugin_dir_url( __FILE__ ) . 'includes/js/main.js', [], false, true );
     }
 
     public function displaySettingsPage() {

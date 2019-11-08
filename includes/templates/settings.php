@@ -9,3 +9,4 @@
     <h1>Wordpress Easy 301 Redirects Settings</h1>
     <hr class="wp-header-end">
 </div>
+<div id="redirects_manager"></div>
