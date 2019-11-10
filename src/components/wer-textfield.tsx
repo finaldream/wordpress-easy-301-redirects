@@ -3,20 +3,25 @@ import { StoreContextConsumer } from '../lib/store-context';
 
 import styled from "styled-components";
 
-const Wrapper = styled.section`
-  padding: 4em;
-  background: papayawhip;
+const Input = styled.input`
+  padding: 2px;
+  width: 100%;
 `;
 
-export interface WerTextfieldProps { content?: string; placeholder?: string; }
+export interface WerTextfieldProps {
+    name: string,
+    content?: string, 
+    placeholder?: string,
+}
 
 export class WerTextfield extends React.Component<WerTextfieldProps, {}> {
     
     public render(): JSX.Element {
         return (
-            <Wrapper>
-                <input type="text" />
-            </Wrapper>
+                <Input type="text" 
+                    name={this.props.name}
+                    value={this.props.content} 
+                    placeholder={this.props.placeholder} />
         )
     }
 }

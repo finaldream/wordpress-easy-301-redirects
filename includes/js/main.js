@@ -36194,6 +36194,80 @@ WerButton.defaultProps = {
 
 /***/ }),
 
+/***/ "./src/components/wer-redirection.tsx":
+/*!********************************************!*\
+  !*** ./src/components/wer-redirection.tsx ***!
+  \********************************************/
+/*! no static exports found */
+/***/ (function(module, exports, __webpack_require__) {
+
+"use strict";
+
+var __importStar = (this && this.__importStar) || function (mod) {
+    if (mod && mod.__esModule) return mod;
+    var result = {};
+    if (mod != null) for (var k in mod) if (Object.hasOwnProperty.call(mod, k)) result[k] = mod[k];
+    result["default"] = mod;
+    return result;
+};
+Object.defineProperty(exports, "__esModule", { value: true });
+const React = __importStar(__webpack_require__(/*! react */ "./node_modules/react/index.js"));
+const wer_button_1 = __webpack_require__(/*! ./wer-button */ "./src/components/wer-button.tsx");
+const wer_textfield_1 = __webpack_require__(/*! ./wer-textfield */ "./src/components/wer-textfield.tsx");
+class WerRedirection extends React.Component {
+    render() {
+        return (React.createElement("tr", { id: this.props.id },
+            React.createElement("td", null,
+                React.createElement(wer_textfield_1.WerTextfield, { name: "wer_request" })),
+            React.createElement("td", null, "\u00BB"),
+            React.createElement("td", null,
+                React.createElement(wer_textfield_1.WerTextfield, { name: "wer_destination" })),
+            React.createElement("td", null, this.props.modificationDate),
+            React.createElement("td", null,
+                React.createElement(wer_button_1.WerButton, null))));
+    }
+}
+exports.WerRedirection = WerRedirection;
+
+
+/***/ }),
+
+/***/ "./src/components/wer-textfield.tsx":
+/*!******************************************!*\
+  !*** ./src/components/wer-textfield.tsx ***!
+  \******************************************/
+/*! no static exports found */
+/***/ (function(module, exports, __webpack_require__) {
+
+"use strict";
+
+var __importStar = (this && this.__importStar) || function (mod) {
+    if (mod && mod.__esModule) return mod;
+    var result = {};
+    if (mod != null) for (var k in mod) if (Object.hasOwnProperty.call(mod, k)) result[k] = mod[k];
+    result["default"] = mod;
+    return result;
+};
+var __importDefault = (this && this.__importDefault) || function (mod) {
+    return (mod && mod.__esModule) ? mod : { "default": mod };
+};
+Object.defineProperty(exports, "__esModule", { value: true });
+const React = __importStar(__webpack_require__(/*! react */ "./node_modules/react/index.js"));
+const styled_components_1 = __importDefault(__webpack_require__(/*! styled-components */ "./node_modules/styled-components/dist/styled-components.browser.esm.js"));
+const Input = styled_components_1.default.input `
+  padding: 2px;
+  width: 100%;
+`;
+class WerTextfield extends React.Component {
+    render() {
+        return (React.createElement(Input, { type: "text", name: this.props.name, value: this.props.content, placeholder: this.props.placeholder }));
+    }
+}
+exports.WerTextfield = WerTextfield;
+
+
+/***/ }),
+
 /***/ "./src/redirects-manager.tsx":
 /*!***********************************!*\
   !*** ./src/redirects-manager.tsx ***!
@@ -36213,8 +36287,22 @@ var __importStar = (this && this.__importStar) || function (mod) {
 Object.defineProperty(exports, "__esModule", { value: true });
 const React = __importStar(__webpack_require__(/*! react */ "./node_modules/react/index.js"));
 const ReactDOM = __importStar(__webpack_require__(/*! react-dom */ "./node_modules/react-dom/index.js"));
-const wer_button_1 = __webpack_require__(/*! ./components/wer-button */ "./src/components/wer-button.tsx");
-ReactDOM.render(React.createElement(wer_button_1.WerButton, null), document.getElementById("redirects_manager"));
+const wer_redirection_1 = __webpack_require__(/*! ./components/wer-redirection */ "./src/components/wer-redirection.tsx");
+class WerTable extends React.Component {
+    render() {
+        return (React.createElement("table", { className: "widefat" },
+            React.createElement("thead", null,
+                React.createElement("tr", null,
+                    React.createElement("th", { colSpan: 2 }, "Request"),
+                    React.createElement("th", null, "Destination"),
+                    React.createElement("th", null, "Last Modification"),
+                    React.createElement("th", null, "Action"))),
+            React.createElement("tbody", null,
+                React.createElement(wer_redirection_1.WerRedirection, { id: "0" }))));
+    }
+}
+exports.WerTable = WerTable;
+ReactDOM.render(React.createElement(WerTable, null), document.getElementById("redirects_manager"));
 
 
 /***/ })

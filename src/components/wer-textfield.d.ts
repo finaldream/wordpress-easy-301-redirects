@@ -1,5 +1,6 @@
 import * as React from "react";
 export interface WerTextfieldProps {
+    name: string;
     content?: string;
     placeholder?: string;
 }
