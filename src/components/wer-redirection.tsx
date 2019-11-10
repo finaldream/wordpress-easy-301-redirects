@@ -16,11 +16,11 @@ export class WerRedirection extends React.Component<RedirectionProps, {}> {
         return (
             <tr id={this.props.id}>
                 <td>
-                    <WerTextfield name="wer_request" />
+                    <WerTextfield name="wer_request" content={this.props.request} />
                 </td>
                 <td>&raquo;</td>
                 <td>
-                    <WerTextfield name="wer_destination" />
+                    <WerTextfield name="wer_destination" content={this.props.destination}/>
                 </td>
                 <td>{this.props.modificationDate}</td>
                 <td>

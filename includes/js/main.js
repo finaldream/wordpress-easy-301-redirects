@@ -36218,10 +36218,10 @@ class WerRedirection extends React.Component {
     render() {
         return (React.createElement("tr", { id: this.props.id },
             React.createElement("td", null,
-                React.createElement(wer_textfield_1.WerTextfield, { name: "wer_request" })),
+                React.createElement(wer_textfield_1.WerTextfield, { name: "wer_request", content: this.props.request })),
             React.createElement("td", null, "\u00BB"),
             React.createElement("td", null,
-                React.createElement(wer_textfield_1.WerTextfield, { name: "wer_destination" })),
+                React.createElement(wer_textfield_1.WerTextfield, { name: "wer_destination", content: this.props.destination })),
             React.createElement("td", null, this.props.modificationDate),
             React.createElement("td", null,
                 React.createElement(wer_button_1.WerButton, null))));
@@ -36288,6 +36288,19 @@ Object.defineProperty(exports, "__esModule", { value: true });
 const React = __importStar(__webpack_require__(/*! react */ "./node_modules/react/index.js"));
 const ReactDOM = __importStar(__webpack_require__(/*! react-dom */ "./node_modules/react-dom/index.js"));
 const wer_redirection_1 = __webpack_require__(/*! ./components/wer-redirection */ "./src/components/wer-redirection.tsx");
+const state = [
+    {
+        id: 1,
+        request: "http://www.google.com",
+        destination: "http://test.org"
+    },
+    {
+        id: 2,
+        request: "http://www.another.com",
+        destination: "http://justme.org"
+    }
+];
+const listRedirections = state.map(redirection => React.createElement(wer_redirection_1.WerRedirection, { id: redirection.id.toString(), destination: redirection.destination, request: redirection.request }));
 class WerTable extends React.Component {
     render() {
         return (React.createElement("table", { className: "widefat" },
@@ -36298,6 +36311,7 @@ class WerTable extends React.Component {
                     React.createElement("th", null, "Last Modification"),
                     React.createElement("th", null, "Action"))),
             React.createElement("tbody", null,
+                listRedirections,
                 React.createElement(wer_redirection_1.WerRedirection, { id: "0" }))));
     }
 }
