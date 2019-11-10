@@ -20,7 +20,7 @@ export class WerTextfield extends React.Component<WerTextfieldProps, {}> {
         return (
                 <Input type="text" 
                     name={this.props.name}
-                    value={this.props.content} 
+                    defaultValue={this.props.content} 
                     placeholder={this.props.placeholder} />
         )
     }

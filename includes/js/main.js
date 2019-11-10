@@ -36194,6 +36194,39 @@ WerButton.defaultProps = {
 
 /***/ }),
 
+/***/ "./src/components/wer-list-redirections.tsx":
+/*!**************************************************!*\
+  !*** ./src/components/wer-list-redirections.tsx ***!
+  \**************************************************/
+/*! no static exports found */
+/***/ (function(module, exports, __webpack_require__) {
+
+"use strict";
+
+var __importStar = (this && this.__importStar) || function (mod) {
+    if (mod && mod.__esModule) return mod;
+    var result = {};
+    if (mod != null) for (var k in mod) if (Object.hasOwnProperty.call(mod, k)) result[k] = mod[k];
+    result["default"] = mod;
+    return result;
+};
+Object.defineProperty(exports, "__esModule", { value: true });
+const React = __importStar(__webpack_require__(/*! react */ "./node_modules/react/index.js"));
+const store_context_1 = __webpack_require__(/*! ../lib/store-context */ "./src/lib/store-context.tsx");
+const wer_redirection_1 = __webpack_require__(/*! ./wer-redirection */ "./src/components/wer-redirection.tsx");
+class WerListRedirections extends React.Component {
+    render() {
+        return (React.createElement(store_context_1.StoreContextConsumer, null, (store) => {
+            const listRedirections = store.map(redirection => React.createElement(wer_redirection_1.WerRedirection, { key: redirection.id, id: redirection.id }));
+            return (listRedirections);
+        }));
+    }
+}
+exports.WerListRedirections = WerListRedirections;
+
+
+/***/ }),
+
 /***/ "./src/components/wer-redirection.tsx":
 /*!********************************************!*\
   !*** ./src/components/wer-redirection.tsx ***!
@@ -36214,17 +36247,25 @@ Object.defineProperty(exports, "__esModule", { value: true });
 const React = __importStar(__webpack_require__(/*! react */ "./node_modules/react/index.js"));
 const wer_button_1 = __webpack_require__(/*! ./wer-button */ "./src/components/wer-button.tsx");
 const wer_textfield_1 = __webpack_require__(/*! ./wer-textfield */ "./src/components/wer-textfield.tsx");
+const store_context_1 = __webpack_require__(/*! ../lib/store-context */ "./src/lib/store-context.tsx");
 class WerRedirection extends React.Component {
     render() {
-        return (React.createElement("tr", { id: this.props.id },
-            React.createElement("td", null,
-                React.createElement(wer_textfield_1.WerTextfield, { name: "wer_request", content: this.props.request })),
-            React.createElement("td", null, "\u00BB"),
-            React.createElement("td", null,
-                React.createElement(wer_textfield_1.WerTextfield, { name: "wer_destination", content: this.props.destination })),
-            React.createElement("td", null, this.props.modificationDate),
-            React.createElement("td", null,
-                React.createElement(wer_button_1.WerButton, null))));
+        return (React.createElement(store_context_1.StoreContextConsumer, null, (store) => {
+            let redirectionState = store.find((el) => {
+                return el.id === this.props.id;
+            }, this);
+            if (!redirectionState)
+                redirectionState = { id: this.props.id, request: null, destination: null, modificationDate: null };
+            return (React.createElement("tr", { id: this.props.id.toString() },
+                React.createElement("td", null,
+                    React.createElement(wer_textfield_1.WerTextfield, { name: "wer_request", content: redirectionState.request })),
+                React.createElement("td", null, "\u00BB"),
+                React.createElement("td", null,
+                    React.createElement(wer_textfield_1.WerTextfield, { name: "wer_destination", content: redirectionState.destination })),
+                React.createElement("td", null, redirectionState.modificationDate),
+                React.createElement("td", null,
+                    React.createElement(wer_button_1.WerButton, null))));
+        }));
     }
 }
 exports.WerRedirection = WerRedirection;
@@ -36260,10 +36301,36 @@ const Input = styled_components_1.default.input `
 `;
 class WerTextfield extends React.Component {
     render() {
-        return (React.createElement(Input, { type: "text", name: this.props.name, value: this.props.content, placeholder: this.props.placeholder }));
+        return (React.createElement(Input, { type: "text", name: this.props.name, defaultValue: this.props.content, placeholder: this.props.placeholder }));
     }
 }
 exports.WerTextfield = WerTextfield;
+
+
+/***/ }),
+
+/***/ "./src/lib/store-context.tsx":
+/*!***********************************!*\
+  !*** ./src/lib/store-context.tsx ***!
+  \***********************************/
+/*! no static exports found */
+/***/ (function(module, exports, __webpack_require__) {
+
+"use strict";
+
+var __importStar = (this && this.__importStar) || function (mod) {
+    if (mod && mod.__esModule) return mod;
+    var result = {};
+    if (mod != null) for (var k in mod) if (Object.hasOwnProperty.call(mod, k)) result[k] = mod[k];
+    result["default"] = mod;
+    return result;
+};
+Object.defineProperty(exports, "__esModule", { value: true });
+const React = __importStar(__webpack_require__(/*! react */ "./node_modules/react/index.js"));
+;
+const StoreContext = React.createContext(null);
+exports.StoreContextProvider = StoreContext.Provider;
+exports.StoreContextConsumer = StoreContext.Consumer;
 
 
 /***/ }),
@@ -36287,6 +36354,8 @@ var __importStar = (this && this.__importStar) || function (mod) {
 Object.defineProperty(exports, "__esModule", { value: true });
 const React = __importStar(__webpack_require__(/*! react */ "./node_modules/react/index.js"));
 const ReactDOM = __importStar(__webpack_require__(/*! react-dom */ "./node_modules/react-dom/index.js"));
+const store_context_1 = __webpack_require__(/*! ./lib/store-context */ "./src/lib/store-context.tsx");
+const wer_list_redirections_1 = __webpack_require__(/*! ./components/wer-list-redirections */ "./src/components/wer-list-redirections.tsx");
 const wer_redirection_1 = __webpack_require__(/*! ./components/wer-redirection */ "./src/components/wer-redirection.tsx");
 const state = [
     {
@@ -36300,7 +36369,6 @@ const state = [
         destination: "http://justme.org"
     }
 ];
-const listRedirections = state.map(redirection => React.createElement(wer_redirection_1.WerRedirection, { id: redirection.id.toString(), destination: redirection.destination, request: redirection.request }));
 class WerTable extends React.Component {
     render() {
         return (React.createElement("table", { className: "widefat" },
@@ -36311,8 +36379,9 @@ class WerTable extends React.Component {
                     React.createElement("th", null, "Last Modification"),
                     React.createElement("th", null, "Action"))),
             React.createElement("tbody", null,
-                listRedirections,
-                React.createElement(wer_redirection_1.WerRedirection, { id: "0" }))));
+                React.createElement(store_context_1.StoreContextProvider, { value: state },
+                    React.createElement(wer_list_redirections_1.WerListRedirections, null),
+                    React.createElement(wer_redirection_1.WerRedirection, { id: "0" })))));
     }
 }
 exports.WerTable = WerTable;

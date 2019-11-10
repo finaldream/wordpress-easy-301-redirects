@@ -1,8 +1,11 @@
 import * as React from "react";
-declare type ContextProps = {
-    children: any;
-    components: {};
-};
-export declare const StoreContextProvider: ({ children, ...store }: ContextProps) => JSX.Element;
-export declare const StoreContextConsumer: React.Consumer<any>;
-export {};
+export interface WerRedirectionData {
+    id: string | number;
+    request: string;
+    destination: string;
+    modificationDate?: any;
+}
+export interface WerContextInterface extends Array<WerRedirectionData> {
+}
+export declare const StoreContextProvider: React.Provider<WerContextInterface>;
+export declare const StoreContextConsumer: React.Consumer<WerContextInterface>;

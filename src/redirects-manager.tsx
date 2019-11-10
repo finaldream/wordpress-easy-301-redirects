@@ -1,7 +1,9 @@
 import * as React from "react";
 import * as ReactDOM from "react-dom";
 import styled from "styled-components";
+import { StoreContextProvider } from "./lib/store-context";
 
+import { WerListRedirections } from "./components/wer-list-redirections"
 import { WerRedirection } from "./components/wer-redirection"
 
 const state = [
@@ -17,14 +19,6 @@ const state = [
     }
 ];
 
-const listRedirections = state.map(redirection => 
-    <WerRedirection 
-        id={redirection.id.toString()}
-        destination={redirection.destination}
-        request={redirection.request}
-    />
-);
-
 export class WerTable extends React.Component {
     public render(): JSX.Element {
         return (
@@ -38,8 +32,10 @@ export class WerTable extends React.Component {
                 </tr>
             </thead>
             <tbody>
-                {listRedirections}
-                <WerRedirection id="0" />
+                <StoreContextProvider value={state}>
+                    <WerListRedirections />
+                    <WerRedirection id="0" />
+                </StoreContextProvider>
             </tbody>
         </table>
         )

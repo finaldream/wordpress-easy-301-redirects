@@ -1,16 +1,17 @@
 import * as React from "react";
+import { string } from "prop-types";
 
-type ContextProps = {
-    children: any,
-    components: {},
-}
+export interface WerRedirectionData {
+    id: string | number,
+    request: string,
+    destination: string,
+    modificationDate?: any
+};
 
-const StoreContext : React.Context<any> = React.createContext({})
+export interface WerContextInterface extends Array<WerRedirectionData> { }
 
-export const StoreContextProvider = ({ children, ...store }: ContextProps) => (
-    <StoreContext.Provider value={{ ...store  }}>
-        {children}
-    </StoreContext.Provider>
-);
+const StoreContext : React.Context<WerContextInterface> = React.createContext<WerContextInterface | null>(null)
+
+export const StoreContextProvider = StoreContext.Provider;
 
 export const StoreContextConsumer = StoreContext.Consumer;
