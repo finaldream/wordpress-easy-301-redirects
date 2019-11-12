@@ -12,12 +12,13 @@ export interface WerRedirectionData {
 
 export interface WerRedirectionsArray extends Array<WerRedirectionData> { };
 
-export interface WerContextInterface {store: WerRedirectionsArray|null, setStore : CallableFunction, getRedirection : CallableFunction };
+export interface WerContextInterface {store: WerRedirectionsArray|null, setStore : CallableFunction, getRedirection : CallableFunction, deleteRedirection : CallableFunction };
 
 const StoreContext : React.Context<WerContextInterface> = React.createContext<WerContextInterface>({
     store: null,
     setStore: (props: WerTextfieldProps, e: React.ChangeEvent<HTMLInputElement>) => { },
-    getRedirection: () => { }
+    getRedirection: () => { },
+    deleteRedirection: () => { }
 })
 
 export const StoreContextProvider = StoreContext.Provider;

@@ -27,6 +27,7 @@ export class WerTable extends React.Component {
     private setStore : CallableFunction;
     private getRedirection: CallableFunction;
     private createRedirection: CallableFunction;
+    private deleteRedirection: CallableFunction;
     public state: WerContextInterface;
 
     constructor(props) {
@@ -35,7 +36,7 @@ export class WerTable extends React.Component {
         this.setStore = (args: WerTextfieldProps, e: React.ChangeEvent<HTMLInputElement>) => {
             var newStore = this.state.store;
             const redirection = newStore.filter((el) => {
-                return el.id == args.id;
+                return el.id === args.id;
             })[0];
             if (redirection) {
                 redirection[args.name] = e.target.value;
@@ -45,16 +46,26 @@ export class WerTable extends React.Component {
             this.setState(newState)
         };
 
-        this.getRedirection = (id: string | number) => {
+        this.getRedirection = (id: string) => {
             return this.state.store.filter((el) => {
                 return el.id === id;
             }, this)[0];
         }
 
+        this.deleteRedirection = (id: string) => {
+            const newStore = this.state.store.filter((el) => {
+                return el.id !== id;
+            });
+            var newState = this.state;
+            newState.store = newStore;
+            this.setState(newState)
+        }
+
         this.state = {
             store: initialState,
             setStore: this.setStore,
-            getRedirection: this.getRedirection
+            getRedirection: this.getRedirection,
+            deleteRedirection: this.deleteRedirection
         }
 
         this.createRedirection = () => {

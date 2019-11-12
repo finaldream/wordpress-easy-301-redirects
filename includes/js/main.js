@@ -36512,7 +36512,7 @@ class WerRedirection extends React.Component {
         super(props);
     }
     render() {
-        return (React.createElement(store_context_1.StoreContextConsumer, null, ({ getRedirection }) => {
+        return (React.createElement(store_context_1.StoreContextConsumer, null, ({ getRedirection, deleteRedirection }) => {
             const redirection = getRedirection(this.props.id);
             return (React.createElement("tr", { id: redirection.id },
                 React.createElement("td", null,
@@ -36522,7 +36522,7 @@ class WerRedirection extends React.Component {
                     React.createElement(wer_textfield_1.WerTextfield, { name: "destination", content: redirection.destination, id: this.props.id })),
                 React.createElement("td", null, redirection.modificationDate),
                 React.createElement("td", null,
-                    React.createElement(wer_button_1.WerButton, null))));
+                    React.createElement(wer_button_1.WerButton, { callback: () => deleteRedirection(this.props.id) }))));
         }));
     }
 }
@@ -36594,7 +36594,8 @@ const React = __importStar(__webpack_require__(/*! react */ "./node_modules/reac
 const StoreContext = React.createContext({
     store: null,
     setStore: (props, e) => { },
-    getRedirection: () => { }
+    getRedirection: () => { },
+    deleteRedirection: () => { }
 });
 exports.StoreContextProvider = StoreContext.Provider;
 exports.StoreContextConsumer = StoreContext.Consumer;
@@ -36643,7 +36644,7 @@ class WerTable extends React.Component {
         this.setStore = (args, e) => {
             var newStore = this.state.store;
             const redirection = newStore.filter((el) => {
-                return el.id == args.id;
+                return el.id === args.id;
             })[0];
             if (redirection) {
                 redirection[args.name] = e.target.value;
@@ -36657,10 +36658,19 @@ class WerTable extends React.Component {
                 return el.id === id;
             }, this)[0];
         };
+        this.deleteRedirection = (id) => {
+            const newStore = this.state.store.filter((el) => {
+                return el.id !== id;
+            });
+            var newState = this.state;
+            newState.store = newStore;
+            this.setState(newState);
+        };
         this.state = {
             store: initialState,
             setStore: this.setStore,
-            getRedirection: this.getRedirection
+            getRedirection: this.getRedirection,
+            deleteRedirection: this.deleteRedirection
         };
         this.createRedirection = () => {
             var newState = this.state;

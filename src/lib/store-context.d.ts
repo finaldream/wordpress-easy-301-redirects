@@ -11,6 +11,7 @@ export interface WerContextInterface {
     store: WerRedirectionsArray | null;
     setStore: CallableFunction;
     getRedirection: CallableFunction;
+    deleteRedirection: CallableFunction;
 }
 export declare const StoreContextProvider: React.Provider<WerContextInterface>;
 export declare const StoreContextConsumer: React.Consumer<WerContextInterface>;

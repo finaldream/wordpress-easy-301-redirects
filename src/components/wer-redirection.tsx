@@ -17,7 +17,7 @@ export class WerRedirection extends React.Component<RedirectionProps, {}> {
     public render(): JSX.Element {
         return (
             <StoreContextConsumer>
-                { ({ getRedirection }) => {
+                { ({ getRedirection, deleteRedirection }) => {
                     const redirection = getRedirection(this.props.id);
                     return (
                         <tr id={redirection.id}>
@@ -30,7 +30,7 @@ export class WerRedirection extends React.Component<RedirectionProps, {}> {
                             </td>
                             <td>{redirection.modificationDate}</td>
                             <td>
-                                <WerButton />
+                                <WerButton callback={() => deleteRedirection(this.props.id)} />
                             </td>
                         </tr>
                     )
