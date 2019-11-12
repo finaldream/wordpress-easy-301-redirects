@@ -10,6 +10,7 @@ const Input = styled.input`
 
 export interface WerTextfieldProps {
     name: string,
+    id: React.ReactText,
     content?: string, 
     placeholder?: string,
 }
@@ -17,11 +18,18 @@ export interface WerTextfieldProps {
 export class WerTextfield extends React.Component<WerTextfieldProps, {}> {
     
     public render(): JSX.Element {
-        return (
-                <Input type="text" 
-                    name={this.props.name}
-                    defaultValue={this.props.content} 
-                    placeholder={this.props.placeholder} />
-        )
+                return (
+                    <StoreContextConsumer>
+                        { ({ setStore }) => {
+                            return (
+                            <Input type="text" 
+                                name={this.props.name}
+                                defaultValue={this.props.content} 
+                                placeholder={this.props.placeholder}
+                                onChange={(e) => setStore(this.props, e)} />
+                            )
+                        }}
+                    </StoreContextConsumer>
+                )
     }
 }

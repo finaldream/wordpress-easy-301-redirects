@@ -1,16 +1,24 @@
 import * as React from "react";
 import { string } from "prop-types";
 
+import { WerTextfieldProps } from "../components/wer-textfield";
+
 export interface WerRedirectionData {
     id: string | number,
-    request: string,
-    destination: string,
+    request?: string,
+    destination?: string,
     modificationDate?: any
 };
 
-export interface WerContextInterface extends Array<WerRedirectionData> { }
+export interface WerRedirectionsArray extends Array<WerRedirectionData> { };
 
-const StoreContext : React.Context<WerContextInterface> = React.createContext<WerContextInterface | null>(null)
+export interface WerContextInterface {store: WerRedirectionsArray|null, setStore : CallableFunction, getRedirection : CallableFunction };
+
+const StoreContext : React.Context<WerContextInterface> = React.createContext<WerContextInterface>({
+    store: null,
+    setStore: (props: WerTextfieldProps, e: React.ChangeEvent<HTMLInputElement>) => { },
+    getRedirection: () => { }
+})
 
 export const StoreContextProvider = StoreContext.Provider;
 

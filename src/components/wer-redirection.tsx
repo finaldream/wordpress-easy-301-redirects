@@ -2,32 +2,33 @@ import * as React from 'react';
 
 import { WerButton } from './wer-button';
 import { WerTextfield } from './wer-textfield';
-import { StoreContextConsumer, WerRedirectionData } from '../lib/store-context';
+import { StoreContextConsumer } from '../lib/store-context';
  
 export interface RedirectionProps {
-    id: React.ReactText
+    id: React.ReactText;
 }
 
 export class WerRedirection extends React.Component<RedirectionProps, {}> {
     
+    constructor(props) {
+        super(props);
+    }
+    
     public render(): JSX.Element {
         return (
             <StoreContextConsumer>
-                { (store) => {
-                     let redirectionState  : WerRedirectionData = store.find((el) => {
-                        return el.id === this.props.id;
-                    }, this);
-                    if (!redirectionState) redirectionState = {id: this.props.id, request: null, destination: null, modificationDate: null };
+                { ({ getRedirection }) => {
+                    const redirection = getRedirection(this.props.id);
                     return (
-                        <tr id={this.props.id.toString()}>
+                        <tr id={redirection.id.toString()}>
                             <td>
-                                <WerTextfield name="wer_request" content={redirectionState.request} />
+                                <WerTextfield name="request" content={redirection.request} id={this.props.id} />
                             </td>
                             <td>&raquo;</td>
                             <td>
-                                <WerTextfield name="wer_destination" content={redirectionState.destination}/>
+                                <WerTextfield name="destination" content={redirection.destination} id={this.props.id} />
                             </td>
-                            <td>{redirectionState.modificationDate}</td>
+                            <td>{redirection.modificationDate}</td>
                             <td>
                                 <WerButton />
                             </td>

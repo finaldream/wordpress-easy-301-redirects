@@ -1,11 +1,16 @@
 import * as React from "react";
 export interface WerRedirectionData {
     id: string | number;
-    request: string;
-    destination: string;
+    request?: string;
+    destination?: string;
     modificationDate?: any;
 }
-export interface WerContextInterface extends Array<WerRedirectionData> {
+export interface WerRedirectionsArray extends Array<WerRedirectionData> {
+}
+export interface WerContextInterface {
+    store: WerRedirectionsArray | null;
+    setStore: CallableFunction;
+    getRedirection: CallableFunction;
 }
 export declare const StoreContextProvider: React.Provider<WerContextInterface>;
 export declare const StoreContextConsumer: React.Consumer<WerContextInterface>;

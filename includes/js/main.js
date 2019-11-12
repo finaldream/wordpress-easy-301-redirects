@@ -36216,9 +36216,8 @@ const store_context_1 = __webpack_require__(/*! ../lib/store-context */ "./src/l
 const wer_redirection_1 = __webpack_require__(/*! ./wer-redirection */ "./src/components/wer-redirection.tsx");
 class WerListRedirections extends React.Component {
     render() {
-        return (React.createElement(store_context_1.StoreContextConsumer, null, (store) => {
-            const listRedirections = store.map(redirection => React.createElement(wer_redirection_1.WerRedirection, { key: redirection.id, id: redirection.id }));
-            return (listRedirections);
+        return (React.createElement(store_context_1.StoreContextConsumer, null, (context) => {
+            return (context.store.map(redirection => React.createElement(wer_redirection_1.WerRedirection, { key: redirection.id, id: redirection.id })));
         }));
     }
 }
@@ -36249,20 +36248,19 @@ const wer_button_1 = __webpack_require__(/*! ./wer-button */ "./src/components/w
 const wer_textfield_1 = __webpack_require__(/*! ./wer-textfield */ "./src/components/wer-textfield.tsx");
 const store_context_1 = __webpack_require__(/*! ../lib/store-context */ "./src/lib/store-context.tsx");
 class WerRedirection extends React.Component {
+    constructor(props) {
+        super(props);
+    }
     render() {
-        return (React.createElement(store_context_1.StoreContextConsumer, null, (store) => {
-            let redirectionState = store.find((el) => {
-                return el.id === this.props.id;
-            }, this);
-            if (!redirectionState)
-                redirectionState = { id: this.props.id, request: null, destination: null, modificationDate: null };
-            return (React.createElement("tr", { id: this.props.id.toString() },
+        return (React.createElement(store_context_1.StoreContextConsumer, null, ({ getRedirection }) => {
+            const redirection = getRedirection(this.props.id);
+            return (React.createElement("tr", { id: redirection.id.toString() },
                 React.createElement("td", null,
-                    React.createElement(wer_textfield_1.WerTextfield, { name: "wer_request", content: redirectionState.request })),
+                    React.createElement(wer_textfield_1.WerTextfield, { name: "request", content: redirection.request, id: this.props.id })),
                 React.createElement("td", null, "\u00BB"),
                 React.createElement("td", null,
-                    React.createElement(wer_textfield_1.WerTextfield, { name: "wer_destination", content: redirectionState.destination })),
-                React.createElement("td", null, redirectionState.modificationDate),
+                    React.createElement(wer_textfield_1.WerTextfield, { name: "destination", content: redirection.destination, id: this.props.id })),
+                React.createElement("td", null, redirection.modificationDate),
                 React.createElement("td", null,
                     React.createElement(wer_button_1.WerButton, null))));
         }));
@@ -36294,6 +36292,7 @@ var __importDefault = (this && this.__importDefault) || function (mod) {
 };
 Object.defineProperty(exports, "__esModule", { value: true });
 const React = __importStar(__webpack_require__(/*! react */ "./node_modules/react/index.js"));
+const store_context_1 = __webpack_require__(/*! ../lib/store-context */ "./src/lib/store-context.tsx");
 const styled_components_1 = __importDefault(__webpack_require__(/*! styled-components */ "./node_modules/styled-components/dist/styled-components.browser.esm.js"));
 const Input = styled_components_1.default.input `
   padding: 2px;
@@ -36301,7 +36300,9 @@ const Input = styled_components_1.default.input `
 `;
 class WerTextfield extends React.Component {
     render() {
-        return (React.createElement(Input, { type: "text", name: this.props.name, defaultValue: this.props.content, placeholder: this.props.placeholder }));
+        return (React.createElement(store_context_1.StoreContextConsumer, null, ({ setStore }) => {
+            return (React.createElement(Input, { type: "text", name: this.props.name, defaultValue: this.props.content, placeholder: this.props.placeholder, onChange: (e) => setStore(this.props, e) }));
+        }));
     }
 }
 exports.WerTextfield = WerTextfield;
@@ -36328,7 +36329,13 @@ var __importStar = (this && this.__importStar) || function (mod) {
 Object.defineProperty(exports, "__esModule", { value: true });
 const React = __importStar(__webpack_require__(/*! react */ "./node_modules/react/index.js"));
 ;
-const StoreContext = React.createContext(null);
+;
+;
+const StoreContext = React.createContext({
+    store: null,
+    setStore: (props, e) => { },
+    getRedirection: () => { }
+});
 exports.StoreContextProvider = StoreContext.Provider;
 exports.StoreContextConsumer = StoreContext.Consumer;
 
@@ -36357,7 +36364,7 @@ const ReactDOM = __importStar(__webpack_require__(/*! react-dom */ "./node_modul
 const store_context_1 = __webpack_require__(/*! ./lib/store-context */ "./src/lib/store-context.tsx");
 const wer_list_redirections_1 = __webpack_require__(/*! ./components/wer-list-redirections */ "./src/components/wer-list-redirections.tsx");
 const wer_redirection_1 = __webpack_require__(/*! ./components/wer-redirection */ "./src/components/wer-redirection.tsx");
-const state = [
+const initialState = [
     {
         id: 1,
         request: "http://www.google.com",
@@ -36370,6 +36377,37 @@ const state = [
     }
 ];
 class WerTable extends React.Component {
+    constructor(props) {
+        super(props);
+        this.setStore = (props, e) => {
+            console.log('on context setStore');
+            var newStore = this.state.store;
+            const redirection = newStore.filter((el) => {
+                return el.id == props.id;
+            })[0];
+            if (redirection) {
+                redirection[props.name] = e.target.value;
+            }
+            else {
+                const newRedirection = { id: 0, [props.name]: e.target.value };
+                newStore.push(newRedirection);
+            }
+            var newState = this.state;
+            newState.store = newStore;
+            this.setState(newState);
+        };
+        this.getRedirection = (id) => {
+            const redirectionState = this.state.store.find((el) => {
+                return el.id === id;
+            }, this);
+            return redirectionState ? redirectionState : { id: 0, request: null, destination: null, modificationDate: null };
+        };
+        this.state = {
+            store: initialState,
+            setStore: this.setStore,
+            getRedirection: this.getRedirection
+        };
+    }
     render() {
         return (React.createElement("table", { className: "widefat" },
             React.createElement("thead", null,
@@ -36379,7 +36417,7 @@ class WerTable extends React.Component {
                     React.createElement("th", null, "Last Modification"),
                     React.createElement("th", null, "Action"))),
             React.createElement("tbody", null,
-                React.createElement(store_context_1.StoreContextProvider, { value: state },
+                React.createElement(store_context_1.StoreContextProvider, { value: this.state },
                     React.createElement(wer_list_redirections_1.WerListRedirections, null),
                     React.createElement(wer_redirection_1.WerRedirection, { id: "0" })))));
     }
