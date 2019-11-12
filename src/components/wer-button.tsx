@@ -3,8 +3,8 @@ import { StoreContextConsumer } from '../lib/store-context';
 
 import styled from "styled-components";
 
-const BaseButton = ({ children }) => (
-    <a className="button">
+const BaseButton = ({ children, callback }) => (
+    <a className="button" onClick={callback}>
       {children}
     </a>
  );
@@ -14,17 +14,18 @@ const StyledButton = styled(BaseButton)`
   background: gray;
 `;
 
-export interface WerButtondProps { caption: string}
+export interface WerButtondProps { caption: string, callback?: CallableFunction}
 
 export class WerButton extends React.Component<WerButtondProps, {}> {
 
     public static defaultProps = {
-        caption: "Delete"
+        caption: "Delete",
+        callback: () => {}
     };
 
     public render(): JSX.Element {
         return (
-            <StyledButton>
+            <StyledButton callback={this.props.callback}>
                 { this.props.caption }
             </StyledButton>
         )

@@ -36154,6 +36154,265 @@ if ( true && typeof window !== 'undefined' && typeof navigator !== 'undefined' &
 
 /***/ }),
 
+/***/ "./node_modules/uuid/index.js":
+/*!************************************!*\
+  !*** ./node_modules/uuid/index.js ***!
+  \************************************/
+/*! no static exports found */
+/***/ (function(module, exports, __webpack_require__) {
+
+var v1 = __webpack_require__(/*! ./v1 */ "./node_modules/uuid/v1.js");
+var v4 = __webpack_require__(/*! ./v4 */ "./node_modules/uuid/v4.js");
+
+var uuid = v4;
+uuid.v1 = v1;
+uuid.v4 = v4;
+
+module.exports = uuid;
+
+
+/***/ }),
+
+/***/ "./node_modules/uuid/lib/bytesToUuid.js":
+/*!**********************************************!*\
+  !*** ./node_modules/uuid/lib/bytesToUuid.js ***!
+  \**********************************************/
+/*! no static exports found */
+/***/ (function(module, exports) {
+
+/**
+ * Convert array of 16 byte values to UUID string format of the form:
+ * XXXXXXXX-XXXX-XXXX-XXXX-XXXXXXXXXXXX
+ */
+var byteToHex = [];
+for (var i = 0; i < 256; ++i) {
+  byteToHex[i] = (i + 0x100).toString(16).substr(1);
+}
+
+function bytesToUuid(buf, offset) {
+  var i = offset || 0;
+  var bth = byteToHex;
+  // join used to fix memory issue caused by concatenation: https://bugs.chromium.org/p/v8/issues/detail?id=3175#c4
+  return ([bth[buf[i++]], bth[buf[i++]], 
+	bth[buf[i++]], bth[buf[i++]], '-',
+	bth[buf[i++]], bth[buf[i++]], '-',
+	bth[buf[i++]], bth[buf[i++]], '-',
+	bth[buf[i++]], bth[buf[i++]], '-',
+	bth[buf[i++]], bth[buf[i++]],
+	bth[buf[i++]], bth[buf[i++]],
+	bth[buf[i++]], bth[buf[i++]]]).join('');
+}
+
+module.exports = bytesToUuid;
+
+
+/***/ }),
+
+/***/ "./node_modules/uuid/lib/rng-browser.js":
+/*!**********************************************!*\
+  !*** ./node_modules/uuid/lib/rng-browser.js ***!
+  \**********************************************/
+/*! no static exports found */
+/***/ (function(module, exports) {
+
+// Unique ID creation requires a high quality random # generator.  In the
+// browser this is a little complicated due to unknown quality of Math.random()
+// and inconsistent support for the `crypto` API.  We do the best we can via
+// feature-detection
+
+// getRandomValues needs to be invoked in a context where "this" is a Crypto
+// implementation. Also, find the complete implementation of crypto on IE11.
+var getRandomValues = (typeof(crypto) != 'undefined' && crypto.getRandomValues && crypto.getRandomValues.bind(crypto)) ||
+                      (typeof(msCrypto) != 'undefined' && typeof window.msCrypto.getRandomValues == 'function' && msCrypto.getRandomValues.bind(msCrypto));
+
+if (getRandomValues) {
+  // WHATWG crypto RNG - http://wiki.whatwg.org/wiki/Crypto
+  var rnds8 = new Uint8Array(16); // eslint-disable-line no-undef
+
+  module.exports = function whatwgRNG() {
+    getRandomValues(rnds8);
+    return rnds8;
+  };
+} else {
+  // Math.random()-based (RNG)
+  //
+  // If all else fails, use Math.random().  It's fast, but is of unspecified
+  // quality.
+  var rnds = new Array(16);
+
+  module.exports = function mathRNG() {
+    for (var i = 0, r; i < 16; i++) {
+      if ((i & 0x03) === 0) r = Math.random() * 0x100000000;
+      rnds[i] = r >>> ((i & 0x03) << 3) & 0xff;
+    }
+
+    return rnds;
+  };
+}
+
+
+/***/ }),
+
+/***/ "./node_modules/uuid/v1.js":
+/*!*********************************!*\
+  !*** ./node_modules/uuid/v1.js ***!
+  \*********************************/
+/*! no static exports found */
+/***/ (function(module, exports, __webpack_require__) {
+
+var rng = __webpack_require__(/*! ./lib/rng */ "./node_modules/uuid/lib/rng-browser.js");
+var bytesToUuid = __webpack_require__(/*! ./lib/bytesToUuid */ "./node_modules/uuid/lib/bytesToUuid.js");
+
+// **`v1()` - Generate time-based UUID**
+//
+// Inspired by https://github.com/LiosK/UUID.js
+// and http://docs.python.org/library/uuid.html
+
+var _nodeId;
+var _clockseq;
+
+// Previous uuid creation time
+var _lastMSecs = 0;
+var _lastNSecs = 0;
+
+// See https://github.com/broofa/node-uuid for API details
+function v1(options, buf, offset) {
+  var i = buf && offset || 0;
+  var b = buf || [];
+
+  options = options || {};
+  var node = options.node || _nodeId;
+  var clockseq = options.clockseq !== undefined ? options.clockseq : _clockseq;
+
+  // node and clockseq need to be initialized to random values if they're not
+  // specified.  We do this lazily to minimize issues related to insufficient
+  // system entropy.  See #189
+  if (node == null || clockseq == null) {
+    var seedBytes = rng();
+    if (node == null) {
+      // Per 4.5, create and 48-bit node id, (47 random bits + multicast bit = 1)
+      node = _nodeId = [
+        seedBytes[0] | 0x01,
+        seedBytes[1], seedBytes[2], seedBytes[3], seedBytes[4], seedBytes[5]
+      ];
+    }
+    if (clockseq == null) {
+      // Per 4.2.2, randomize (14 bit) clockseq
+      clockseq = _clockseq = (seedBytes[6] << 8 | seedBytes[7]) & 0x3fff;
+    }
+  }
+
+  // UUID timestamps are 100 nano-second units since the Gregorian epoch,
+  // (1582-10-15 00:00).  JSNumbers aren't precise enough for this, so
+  // time is handled internally as 'msecs' (integer milliseconds) and 'nsecs'
+  // (100-nanoseconds offset from msecs) since unix epoch, 1970-01-01 00:00.
+  var msecs = options.msecs !== undefined ? options.msecs : new Date().getTime();
+
+  // Per 4.2.1.2, use count of uuid's generated during the current clock
+  // cycle to simulate higher resolution clock
+  var nsecs = options.nsecs !== undefined ? options.nsecs : _lastNSecs + 1;
+
+  // Time since last uuid creation (in msecs)
+  var dt = (msecs - _lastMSecs) + (nsecs - _lastNSecs)/10000;
+
+  // Per 4.2.1.2, Bump clockseq on clock regression
+  if (dt < 0 && options.clockseq === undefined) {
+    clockseq = clockseq + 1 & 0x3fff;
+  }
+
+  // Reset nsecs if clock regresses (new clockseq) or we've moved onto a new
+  // time interval
+  if ((dt < 0 || msecs > _lastMSecs) && options.nsecs === undefined) {
+    nsecs = 0;
+  }
+
+  // Per 4.2.1.2 Throw error if too many uuids are requested
+  if (nsecs >= 10000) {
+    throw new Error('uuid.v1(): Can\'t create more than 10M uuids/sec');
+  }
+
+  _lastMSecs = msecs;
+  _lastNSecs = nsecs;
+  _clockseq = clockseq;
+
+  // Per 4.1.4 - Convert from unix epoch to Gregorian epoch
+  msecs += 12219292800000;
+
+  // `time_low`
+  var tl = ((msecs & 0xfffffff) * 10000 + nsecs) % 0x100000000;
+  b[i++] = tl >>> 24 & 0xff;
+  b[i++] = tl >>> 16 & 0xff;
+  b[i++] = tl >>> 8 & 0xff;
+  b[i++] = tl & 0xff;
+
+  // `time_mid`
+  var tmh = (msecs / 0x100000000 * 10000) & 0xfffffff;
+  b[i++] = tmh >>> 8 & 0xff;
+  b[i++] = tmh & 0xff;
+
+  // `time_high_and_version`
+  b[i++] = tmh >>> 24 & 0xf | 0x10; // include version
+  b[i++] = tmh >>> 16 & 0xff;
+
+  // `clock_seq_hi_and_reserved` (Per 4.2.2 - include variant)
+  b[i++] = clockseq >>> 8 | 0x80;
+
+  // `clock_seq_low`
+  b[i++] = clockseq & 0xff;
+
+  // `node`
+  for (var n = 0; n < 6; ++n) {
+    b[i + n] = node[n];
+  }
+
+  return buf ? buf : bytesToUuid(b);
+}
+
+module.exports = v1;
+
+
+/***/ }),
+
+/***/ "./node_modules/uuid/v4.js":
+/*!*********************************!*\
+  !*** ./node_modules/uuid/v4.js ***!
+  \*********************************/
+/*! no static exports found */
+/***/ (function(module, exports, __webpack_require__) {
+
+var rng = __webpack_require__(/*! ./lib/rng */ "./node_modules/uuid/lib/rng-browser.js");
+var bytesToUuid = __webpack_require__(/*! ./lib/bytesToUuid */ "./node_modules/uuid/lib/bytesToUuid.js");
+
+function v4(options, buf, offset) {
+  var i = buf && offset || 0;
+
+  if (typeof(options) == 'string') {
+    buf = options === 'binary' ? new Array(16) : null;
+    options = null;
+  }
+  options = options || {};
+
+  var rnds = options.random || (options.rng || rng)();
+
+  // Per 4.4, set bits for version and `clock_seq_hi_and_reserved`
+  rnds[6] = (rnds[6] & 0x0f) | 0x40;
+  rnds[8] = (rnds[8] & 0x3f) | 0x80;
+
+  // Copy bytes to buffer, if provided
+  if (buf) {
+    for (var ii = 0; ii < 16; ++ii) {
+      buf[i + ii] = rnds[ii];
+    }
+  }
+
+  return buf || bytesToUuid(rnds);
+}
+
+module.exports = v4;
+
+
+/***/ }),
+
 /***/ "./src/components/wer-button.tsx":
 /*!***************************************!*\
   !*** ./src/components/wer-button.tsx ***!
@@ -36176,19 +36435,20 @@ var __importDefault = (this && this.__importDefault) || function (mod) {
 Object.defineProperty(exports, "__esModule", { value: true });
 const React = __importStar(__webpack_require__(/*! react */ "./node_modules/react/index.js"));
 const styled_components_1 = __importDefault(__webpack_require__(/*! styled-components */ "./node_modules/styled-components/dist/styled-components.browser.esm.js"));
-const BaseButton = ({ children }) => (React.createElement("a", { className: "button" }, children));
+const BaseButton = ({ children, callback }) => (React.createElement("a", { className: "button", onClick: callback }, children));
 const StyledButton = styled_components_1.default(BaseButton) `
   border: 1px solid #000;
   background: gray;
 `;
 class WerButton extends React.Component {
     render() {
-        return (React.createElement(StyledButton, null, this.props.caption));
+        return (React.createElement(StyledButton, { callback: this.props.callback }, this.props.caption));
     }
 }
 exports.WerButton = WerButton;
 WerButton.defaultProps = {
-    caption: "Delete"
+    caption: "Delete",
+    callback: () => { }
 };
 
 
@@ -36254,7 +36514,7 @@ class WerRedirection extends React.Component {
     render() {
         return (React.createElement(store_context_1.StoreContextConsumer, null, ({ getRedirection }) => {
             const redirection = getRedirection(this.props.id);
-            return (React.createElement("tr", { id: redirection.id.toString() },
+            return (React.createElement("tr", { id: redirection.id },
                 React.createElement("td", null,
                     React.createElement(wer_textfield_1.WerTextfield, { name: "request", content: redirection.request, id: this.props.id })),
                 React.createElement("td", null, "\u00BB"),
@@ -36361,51 +36621,51 @@ var __importStar = (this && this.__importStar) || function (mod) {
 Object.defineProperty(exports, "__esModule", { value: true });
 const React = __importStar(__webpack_require__(/*! react */ "./node_modules/react/index.js"));
 const ReactDOM = __importStar(__webpack_require__(/*! react-dom */ "./node_modules/react-dom/index.js"));
+const uuid_1 = __webpack_require__(/*! uuid */ "./node_modules/uuid/index.js");
 const store_context_1 = __webpack_require__(/*! ./lib/store-context */ "./src/lib/store-context.tsx");
 const wer_list_redirections_1 = __webpack_require__(/*! ./components/wer-list-redirections */ "./src/components/wer-list-redirections.tsx");
-const wer_redirection_1 = __webpack_require__(/*! ./components/wer-redirection */ "./src/components/wer-redirection.tsx");
+const wer_button_1 = __webpack_require__(/*! ./components/wer-button */ "./src/components/wer-button.tsx");
 const initialState = [
     {
-        id: 1,
+        id: uuid_1.v4(),
         request: "http://www.google.com",
         destination: "http://test.org"
     },
     {
-        id: 2,
+        id: uuid_1.v4(),
         request: "http://www.another.com",
         destination: "http://justme.org"
-    }
+    },
 ];
 class WerTable extends React.Component {
     constructor(props) {
         super(props);
-        this.setStore = (props, e) => {
-            console.log('on context setStore');
+        this.setStore = (args, e) => {
             var newStore = this.state.store;
             const redirection = newStore.filter((el) => {
-                return el.id == props.id;
+                return el.id == args.id;
             })[0];
             if (redirection) {
-                redirection[props.name] = e.target.value;
-            }
-            else {
-                const newRedirection = { id: 0, [props.name]: e.target.value };
-                newStore.push(newRedirection);
+                redirection[args.name] = e.target.value;
             }
             var newState = this.state;
             newState.store = newStore;
             this.setState(newState);
         };
         this.getRedirection = (id) => {
-            const redirectionState = this.state.store.find((el) => {
+            return this.state.store.filter((el) => {
                 return el.id === id;
-            }, this);
-            return redirectionState ? redirectionState : { id: 0, request: null, destination: null, modificationDate: null };
+            }, this)[0];
         };
         this.state = {
             store: initialState,
             setStore: this.setStore,
             getRedirection: this.getRedirection
+        };
+        this.createRedirection = () => {
+            var newState = this.state;
+            newState.store.push({ id: uuid_1.v4() });
+            this.setState(newState);
         };
     }
     render() {
@@ -36418,8 +36678,11 @@ class WerTable extends React.Component {
                     React.createElement("th", null, "Action"))),
             React.createElement("tbody", null,
                 React.createElement(store_context_1.StoreContextProvider, { value: this.state },
-                    React.createElement(wer_list_redirections_1.WerListRedirections, null),
-                    React.createElement(wer_redirection_1.WerRedirection, { id: "0" })))));
+                    React.createElement(wer_list_redirections_1.WerListRedirections, null))),
+            React.createElement("tfoot", null,
+                React.createElement("tr", null,
+                    React.createElement("th", { colSpan: 5 },
+                        React.createElement(wer_button_1.WerButton, { caption: "Add new Redirection", callback: this.createRedirection }))))));
     }
 }
 exports.WerTable = WerTable;

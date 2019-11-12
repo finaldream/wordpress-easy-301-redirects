@@ -10,7 +10,7 @@ const Input = styled.input`
 
 export interface WerTextfieldProps {
     name: string,
-    id: React.ReactText,
+    id: string,
     content?: string, 
     placeholder?: string,
 }

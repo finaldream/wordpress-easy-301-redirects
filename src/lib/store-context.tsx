@@ -4,7 +4,7 @@ import { string } from "prop-types";
 import { WerTextfieldProps } from "../components/wer-textfield";
 
 export interface WerRedirectionData {
-    id: string | number,
+    id: string,
     request?: string,
     destination?: string,
     modificationDate?: any

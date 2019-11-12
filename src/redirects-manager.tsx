@@ -1,45 +1,44 @@
 import * as React from "react";
 import * as ReactDOM from "react-dom";
+import { v4 } from "uuid"
 
 import { StoreContextProvider, WerRedirectionsArray, WerRedirectionData, WerContextInterface } from "./lib/store-context";
 
 import { WerListRedirections } from "./components/wer-list-redirections"
 import { WerRedirection } from "./components/wer-redirection"
 import { WerTextfieldProps } from "./components/wer-textfield";
+import { WerButton } from './components/wer-button';
 
-const initialState = [
+const initialState : WerRedirectionsArray = [
     {
-        id: 1,
+        id: v4(),
         request: "http://www.google.com",
         destination: "http://test.org"
     },    
     {
-        id: 2,
+        id: v4(),
         request: "http://www.another.com",
         destination: "http://justme.org"
-    }
+    },
 ];
 
 export class WerTable extends React.Component {
 
     private setStore : CallableFunction;
     private getRedirection: CallableFunction;
+    private createRedirection: CallableFunction;
     public state: WerContextInterface;
 
     constructor(props) {
         super(props);
 
-        this.setStore = (props: WerTextfieldProps, e: React.ChangeEvent<HTMLInputElement>) => {
-            console.log('on context setStore');
+        this.setStore = (args: WerTextfieldProps, e: React.ChangeEvent<HTMLInputElement>) => {
             var newStore = this.state.store;
             const redirection = newStore.filter((el) => {
-                return el.id == props.id;
+                return el.id == args.id;
             })[0];
             if (redirection) {
-                redirection[props.name] = e.target.value;
-            } else {
-                const newRedirection : WerRedirectionData = { id: 0, [props.name] : e.target.value }
-                newStore.push(newRedirection)
+                redirection[args.name] = e.target.value;
             }
             var newState = this.state;
             newState.store = newStore;
@@ -47,16 +46,21 @@ export class WerTable extends React.Component {
         };
 
         this.getRedirection = (id: string | number) => {
-            const redirectionState = this.state.store.find((el) => {
+            return this.state.store.filter((el) => {
                 return el.id === id;
-            }, this)
-            return redirectionState ? redirectionState : {id: 0, request: null, destination: null, modificationDate: null };
+            }, this)[0];
         }
 
         this.state = {
             store: initialState,
             setStore: this.setStore,
             getRedirection: this.getRedirection
+        }
+
+        this.createRedirection = () => {
+            var newState = this.state;
+            newState.store.push({id: v4()})
+            this.setState(newState);
         }
     }
     
@@ -74,9 +78,13 @@ export class WerTable extends React.Component {
             <tbody>
                 <StoreContextProvider value={this.state}>
                     <WerListRedirections />
-                    <WerRedirection id="0" />
                 </StoreContextProvider>
             </tbody>
+            <tfoot>
+                <tr>
+                    <th colSpan={5}><WerButton caption="Add new Redirection" callback={this.createRedirection} /></th>
+                </tr>
+            </tfoot>
         </table>
         )
     }

@@ -1,6 +1,6 @@
 import * as React from "react";
 export interface WerRedirectionData {
-    id: string | number;
+    id: string;
     request?: string;
     destination?: string;
     modificationDate?: any;

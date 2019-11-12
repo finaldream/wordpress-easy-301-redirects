@@ -5,7 +5,7 @@ import { WerTextfield } from './wer-textfield';
 import { StoreContextConsumer } from '../lib/store-context';
  
 export interface RedirectionProps {
-    id: React.ReactText;
+    id: string;
 }
 
 export class WerRedirection extends React.Component<RedirectionProps, {}> {
@@ -20,7 +20,7 @@ export class WerRedirection extends React.Component<RedirectionProps, {}> {
                 { ({ getRedirection }) => {
                     const redirection = getRedirection(this.props.id);
                     return (
-                        <tr id={redirection.id.toString()}>
+                        <tr id={redirection.id}>
                             <td>
                                 <WerTextfield name="request" content={redirection.request} id={this.props.id} />
                             </td>
