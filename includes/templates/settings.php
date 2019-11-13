@@ -20,6 +20,11 @@
                 "id": "test2",
                 "request": "http://www.another.com",
                 "destination": "http://justme.org"
+            },
+            {
+                "id": "test3",
+                "request": "http://www.another.com",
+                "destination": "http://justme.org"
             }
         ]
         </script> 

@@ -49,27 +49,14 @@ export class WerTable extends React.Component<WerTableProps> {
                 return el.id !== id;
             });
             var newState = this.state;
-            newState.store = newStore;
+            newState.store = this.validateStore(newStore);
             this.setState(newState)
-        }
-
-        this.state = {
-            store: this.props.initialState,
-            setStore: this.setStore,
-            getRedirection: this.getRedirection,
-            deleteRedirection: this.deleteRedirection
-        }
-
-        this.createRedirection = () => {
-            var newState = this.state;
-            newState.store.push({id: v4()})
-            this.setState(newState);
         }
 
         this.validateStore = (store) => {
             const validatedStore: Array<WerRedirectionData> = store.map((redirection) => {
                 if(redirection.request && redirection.request !== '') {
-                    const colliders = this.state.store.filter(el => {
+                    const colliders = store.filter(el => {
                         return el.request === redirection.request;
                     })
                     redirection.warningRequestDuplication = colliders.length > 1;
@@ -79,6 +66,19 @@ export class WerTable extends React.Component<WerTableProps> {
                 return redirection
             }, this)
             return validatedStore;
+        }
+
+        this.state = {
+            store: this.validateStore(this.props.initialState),
+            setStore: this.setStore,
+            getRedirection: this.getRedirection,
+            deleteRedirection: this.deleteRedirection
+        }
+
+        this.createRedirection = () => {
+            var newState = this.state;
+            newState.store.push({id: v4()})
+            this.setState(newState);
         }
     }
 

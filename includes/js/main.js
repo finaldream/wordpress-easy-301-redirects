@@ -36977,24 +36977,13 @@ class WerTable extends React.Component {
                 return el.id !== id;
             });
             var newState = this.state;
-            newState.store = newStore;
-            this.setState(newState);
-        };
-        this.state = {
-            store: this.props.initialState,
-            setStore: this.setStore,
-            getRedirection: this.getRedirection,
-            deleteRedirection: this.deleteRedirection
-        };
-        this.createRedirection = () => {
-            var newState = this.state;
-            newState.store.push({ id: uuid_1.v4() });
+            newState.store = this.validateStore(newStore);
             this.setState(newState);
         };
         this.validateStore = (store) => {
             const validatedStore = store.map((redirection) => {
                 if (redirection.request && redirection.request !== '') {
-                    const colliders = this.state.store.filter(el => {
+                    const colliders = store.filter(el => {
                         return el.request === redirection.request;
                     });
                     redirection.warningRequestDuplication = colliders.length > 1;
@@ -37005,6 +36994,17 @@ class WerTable extends React.Component {
                 return redirection;
             }, this);
             return validatedStore;
+        };
+        this.state = {
+            store: this.validateStore(this.props.initialState),
+            setStore: this.setStore,
+            getRedirection: this.getRedirection,
+            deleteRedirection: this.deleteRedirection
+        };
+        this.createRedirection = () => {
+            var newState = this.state;
+            newState.store.push({ id: uuid_1.v4() });
+            this.setState(newState);
         };
     }
     render() {
