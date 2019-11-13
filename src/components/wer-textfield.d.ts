@@ -4,6 +4,7 @@ export interface WerTextfieldProps {
     id: string;
     content?: string;
     placeholder?: string;
+    warning?: boolean;
 }
 export declare class WerTextfield extends React.Component<WerTextfieldProps, {}> {
     render(): JSX.Element;

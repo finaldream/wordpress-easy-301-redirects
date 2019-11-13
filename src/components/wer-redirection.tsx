@@ -2,7 +2,7 @@ import * as React from 'react';
 
 import { WerButton } from './wer-button';
 import { WerTextfield } from './wer-textfield';
-import { StoreContextConsumer } from '../lib/store-context';
+import { StoreContextConsumer, WerRedirectionData } from '../lib/store-context';
  
 export interface RedirectionProps {
     id: string;
@@ -18,11 +18,11 @@ export class WerRedirection extends React.Component<RedirectionProps, {}> {
         return (
             <StoreContextConsumer>
                 { ({ getRedirection, deleteRedirection }) => {
-                    const redirection = getRedirection(this.props.id);
+                    const redirection : WerRedirectionData = getRedirection(this.props.id);
                     return (
                         <tr id={redirection.id}>
                             <td>
-                                <WerTextfield name="request" content={redirection.request} id={this.props.id} />
+                                <WerTextfield name="request" content={redirection.request} id={this.props.id} warning={redirection.warningRequestDuplication} />
                             </td>
                             <td>&raquo;</td>
                             <td>

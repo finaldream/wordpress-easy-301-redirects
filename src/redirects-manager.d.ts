@@ -5,6 +5,7 @@ export declare class WerTable extends React.Component {
     private getRedirection;
     private createRedirection;
     private deleteRedirection;
+    private validateStore;
     state: WerContextInterface;
     constructor(props: any);
     render(): JSX.Element;

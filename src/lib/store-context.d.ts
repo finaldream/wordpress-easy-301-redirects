@@ -4,6 +4,7 @@ export interface WerRedirectionData {
     request?: string;
     destination?: string;
     modificationDate?: any;
+    warningRequestDuplication?: boolean;
 }
 export interface WerRedirectionsArray extends Array<WerRedirectionData> {
 }

@@ -24,10 +24,11 @@ const initialState : WerRedirectionsArray = [
 
 export class WerTable extends React.Component {
 
-    private setStore : CallableFunction;
-    private getRedirection: CallableFunction;
-    private createRedirection: CallableFunction;
-    private deleteRedirection: CallableFunction;
+    private setStore : (args: WerTextfieldProps, e: React.ChangeEvent<HTMLInputElement>) => void;
+    private getRedirection: (id: string) => WerRedirectionData;
+    private createRedirection: () => void;
+    private deleteRedirection: (id: string) => void;
+    private validateStore: (store : Array<WerRedirectionData>) => Array<WerRedirectionData>;
     public state: WerContextInterface;
 
     constructor(props) {
@@ -42,8 +43,8 @@ export class WerTable extends React.Component {
                 redirection[args.name] = e.target.value;
             }
             var newState = this.state;
-            newState.store = newStore;
-            this.setState(newState)
+            newState.store = this.validateStore(newStore);
+            this.setState(newState);
         };
 
         this.getRedirection = (id: string) => {
@@ -72,6 +73,21 @@ export class WerTable extends React.Component {
             var newState = this.state;
             newState.store.push({id: v4()})
             this.setState(newState);
+        }
+
+        this.validateStore = (store) => {
+            const validatedStore: Array<WerRedirectionData> = store.map((redirection) => {
+                if(redirection.request && redirection.request !== '') {
+                    const colliders = this.state.store.filter(el => {
+                        return el.request === redirection.request;
+                    })
+                    redirection.warningRequestDuplication = colliders.length > 1;
+                } else {
+                    redirection.warningRequestDuplication = false;
+                }
+                return redirection
+            }, this)
+            return validatedStore;
         }
     }
     

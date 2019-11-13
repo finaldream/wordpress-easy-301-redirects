@@ -36516,7 +36516,7 @@ class WerRedirection extends React.Component {
             const redirection = getRedirection(this.props.id);
             return (React.createElement("tr", { id: redirection.id },
                 React.createElement("td", null,
-                    React.createElement(wer_textfield_1.WerTextfield, { name: "request", content: redirection.request, id: this.props.id })),
+                    React.createElement(wer_textfield_1.WerTextfield, { name: "request", content: redirection.request, id: this.props.id, warning: redirection.warningRequestDuplication })),
                 React.createElement("td", null, "\u00BB"),
                 React.createElement("td", null,
                     React.createElement(wer_textfield_1.WerTextfield, { name: "destination", content: redirection.destination, id: this.props.id })),
@@ -36557,11 +36557,12 @@ const styled_components_1 = __importDefault(__webpack_require__(/*! styled-compo
 const Input = styled_components_1.default.input `
   padding: 2px;
   width: 100%;
+  border: ${props => props.warning ? '2px solid red !important' : '1px solid #ddd !important'};
 `;
 class WerTextfield extends React.Component {
     render() {
         return (React.createElement(store_context_1.StoreContextConsumer, null, ({ setStore }) => {
-            return (React.createElement(Input, { type: "text", name: this.props.name, defaultValue: this.props.content, placeholder: this.props.placeholder, onChange: (e) => setStore(this.props, e) }));
+            return (React.createElement(Input, { type: "text", name: this.props.name, defaultValue: this.props.content, placeholder: this.props.placeholder, onChange: (e) => setStore(this.props, e), warning: this.props.warning }));
         }));
     }
 }
@@ -36650,7 +36651,7 @@ class WerTable extends React.Component {
                 redirection[args.name] = e.target.value;
             }
             var newState = this.state;
-            newState.store = newStore;
+            newState.store = this.validateStore(newStore);
             this.setState(newState);
         };
         this.getRedirection = (id) => {
@@ -36676,6 +36677,21 @@ class WerTable extends React.Component {
             var newState = this.state;
             newState.store.push({ id: uuid_1.v4() });
             this.setState(newState);
+        };
+        this.validateStore = (store) => {
+            const validatedStore = store.map((redirection) => {
+                if (redirection.request && redirection.request !== '') {
+                    const colliders = this.state.store.filter(el => {
+                        return el.request === redirection.request;
+                    });
+                    redirection.warningRequestDuplication = colliders.length > 1;
+                }
+                else {
+                    redirection.warningRequestDuplication = false;
+                }
+                return redirection;
+            }, this);
+            return validatedStore;
         };
     }
     render() {
