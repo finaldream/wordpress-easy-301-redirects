@@ -3,6 +3,7 @@
     "version": "1.0.0",
     "description": "Frontend component for wordpress-easy-301-redirects",
     "dependencies": {
+        "mount-component": "^1.3.0",
         "react": "^16.11.*",
         "react-dom": "^16.11.*",
         "styled-components": "^4.4.1",

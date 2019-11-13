@@ -1,6 +1,7 @@
 import * as React from "react";
 import * as ReactDOM from "react-dom";
 import { v4 } from "uuid"
+import { mountComponent } from 'mount-component';
 
 import { StoreContextProvider, WerRedirectionsArray, WerRedirectionData, WerContextInterface } from "./lib/store-context";
 
@@ -9,20 +10,10 @@ import { WerRedirection } from "./components/wer-redirection"
 import { WerTextfieldProps } from "./components/wer-textfield";
 import { WerButton } from './components/wer-button';
 
-const initialState : WerRedirectionsArray = [
-    {
-        id: v4(),
-        request: "http://www.google.com",
-        destination: "http://test.org"
-    },    
-    {
-        id: v4(),
-        request: "http://www.another.com",
-        destination: "http://justme.org"
-    },
-];
-
-export class WerTable extends React.Component {
+export interface WerTableProps {
+    initialState: Array<WerRedirectionData>;
+}
+export class WerTable extends React.Component<WerTableProps> {
 
     private setStore : (args: WerTextfieldProps, e: React.ChangeEvent<HTMLInputElement>) => void;
     private getRedirection: (id: string) => WerRedirectionData;
@@ -63,7 +54,7 @@ export class WerTable extends React.Component {
         }
 
         this.state = {
-            store: initialState,
+            store: this.props.initialState,
             setStore: this.setStore,
             getRedirection: this.getRedirection,
             deleteRedirection: this.deleteRedirection
@@ -90,6 +81,10 @@ export class WerTable extends React.Component {
             return validatedStore;
         }
     }
+
+    public static defaultProps = {
+        initialState: []
+    };
     
     public render(): JSX.Element {
         return (
@@ -117,7 +112,4 @@ export class WerTable extends React.Component {
     }
 }
 
-ReactDOM.render(
-    <WerTable />,
-    document.getElementById("redirects_manager")
-);
+mountComponent('#redirects_manager', WerTable);
