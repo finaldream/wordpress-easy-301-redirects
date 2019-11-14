@@ -36921,7 +36921,9 @@ const StoreContext = React.createContext({
     store: null,
     setStore: (props, e) => { },
     getRedirection: () => { },
-    deleteRedirection: () => { }
+    deleteRedirection: () => { },
+    saving: false,
+    lastSave: {}
 });
 exports.StoreContextProvider = StoreContext.Provider;
 exports.StoreContextConsumer = StoreContext.Consumer;
@@ -36938,6 +36940,15 @@ exports.StoreContextConsumer = StoreContext.Consumer;
 
 "use strict";
 
+var __awaiter = (this && this.__awaiter) || function (thisArg, _arguments, P, generator) {
+    function adopt(value) { return value instanceof P ? value : new P(function (resolve) { resolve(value); }); }
+    return new (P || (P = Promise))(function (resolve, reject) {
+        function fulfilled(value) { try { step(generator.next(value)); } catch (e) { reject(e); } }
+        function rejected(value) { try { step(generator["throw"](value)); } catch (e) { reject(e); } }
+        function step(result) { result.done ? resolve(result.value) : adopt(result.value).then(fulfilled, rejected); }
+        step((generator = generator.apply(thisArg, _arguments || [])).next());
+    });
+};
 var __importStar = (this && this.__importStar) || function (mod) {
     if (mod && mod.__esModule) return mod;
     var result = {};
@@ -36952,6 +36963,7 @@ const mount_component_1 = __webpack_require__(/*! mount-component */ "./node_mod
 const store_context_1 = __webpack_require__(/*! ./lib/store-context */ "./src/lib/store-context.tsx");
 const wer_list_redirections_1 = __webpack_require__(/*! ./components/wer-list-redirections */ "./src/components/wer-list-redirections.tsx");
 const wer_button_1 = __webpack_require__(/*! ./components/wer-button */ "./src/components/wer-button.tsx");
+const ajaxUrl = window.ajaxurl;
 class WerTable extends React.Component {
     constructor(props) {
         super(props);
@@ -36992,20 +37004,52 @@ class WerTable extends React.Component {
                     redirection.warningRequestDuplication = false;
                 }
                 return redirection;
-            }, this);
+            });
             return validatedStore;
         };
+        this.validateLoad = (store) => {
+            const validatedLoad = store.map((redirection) => {
+                if (!redirection.id || redirection.id === '')
+                    redirection.id = uuid_1.v4();
+                return redirection;
+            });
+            return this.validateStore(validatedLoad);
+        };
         this.state = {
-            store: this.validateStore(this.props.initialState),
+            store: this.validateLoad(this.props.initialState),
             setStore: this.setStore,
             getRedirection: this.getRedirection,
-            deleteRedirection: this.deleteRedirection
+            deleteRedirection: this.deleteRedirection,
+            saving: false,
+            lastSave: null,
         };
         this.createRedirection = () => {
             var newState = this.state;
             newState.store.push({ id: uuid_1.v4() });
             this.setState(newState);
         };
+        this.saveStore = () => __awaiter(this, void 0, void 0, function* () {
+            this.setState({ saving: true });
+            const init = {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json'
+                },
+                body: JSON.stringify(this.state.store)
+            };
+            let result;
+            try {
+                result = yield fetch(ajaxUrl + '?action=saveRedirects', init);
+            }
+            catch (e) {
+                throw e;
+            }
+            this.setState({ saving: false });
+            if (result.ok) {
+                const data = yield result.json();
+                this.setState({ lastSave: data });
+            }
+        });
     }
     render() {
         return (React.createElement("table", { className: "widefat" },
@@ -37021,7 +37065,8 @@ class WerTable extends React.Component {
             React.createElement("tfoot", null,
                 React.createElement("tr", null,
                     React.createElement("th", { colSpan: 5 },
-                        React.createElement(wer_button_1.WerButton, { caption: "Add new Redirection", callback: this.createRedirection }))))));
+                        React.createElement(wer_button_1.WerButton, { caption: "Add new Redirection", callback: this.createRedirection }),
+                        React.createElement(wer_button_1.WerButton, { caption: "Save Redirections", callback: () => __awaiter(this, void 0, void 0, function* () { return yield this.saveStore(); }) }))))));
     }
 }
 exports.WerTable = WerTable;

@@ -4,7 +4,7 @@ import { StoreContextConsumer } from '../lib/store-context';
 import styled from "styled-components";
 
 const BaseButton = ({ children, callback }) => (
-    <a className="button" onClick={callback}>
+    <a className="button" onClick={callback} >
       {children}
     </a>
  );
@@ -25,7 +25,7 @@ export class WerButton extends React.Component<WerButtondProps, {}> {
 
     public render(): JSX.Element {
         return (
-            <StyledButton callback={this.props.callback}>
+            <StyledButton callback= {this.props.callback}>
                 { this.props.caption }
             </StyledButton>
         )

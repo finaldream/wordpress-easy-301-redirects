@@ -9,6 +9,8 @@ export declare class WerTable extends React.Component<WerTableProps> {
     private createRedirection;
     private deleteRedirection;
     private validateStore;
+    private validateLoad;
+    private saveStore;
     state: WerContextInterface;
     constructor(props: any);
     static defaultProps: {

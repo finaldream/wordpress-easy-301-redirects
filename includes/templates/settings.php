@@ -10,23 +10,7 @@
     <hr class="wp-header-end">
     <div id="redirects_manager">
         <script type="application/json" data-name="initial-state">
-        [
-            {
-                "id": "test1",
-                "request": "http://www.google.com",
-                "destination": "http://test.org"
-            },
-            {
-                "id": "test2",
-                "request": "http://www.another.com",
-                "destination": "http://justme.org"
-            },
-            {
-                "id": "test3",
-                "request": "http://www.another.com",
-                "destination": "http://justme.org"
-            }
-        ]
+        <?= $this->getRedirectsJson() ?>
         </script> 
     </div>
 </div>

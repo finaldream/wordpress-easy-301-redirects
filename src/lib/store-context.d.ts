@@ -13,6 +13,8 @@ export interface WerContextInterface {
     setStore: CallableFunction;
     getRedirection: CallableFunction;
     deleteRedirection: CallableFunction;
+    saving: boolean;
+    lastSave: {};
 }
 export declare const StoreContextProvider: React.Provider<WerContextInterface>;
 export declare const StoreContextConsumer: React.Consumer<WerContextInterface>;

@@ -6,13 +6,15 @@ import { mountComponent } from 'mount-component';
 import { StoreContextProvider, WerRedirectionsArray, WerRedirectionData, WerContextInterface } from "./lib/store-context";
 
 import { WerListRedirections } from "./components/wer-list-redirections"
-import { WerRedirection } from "./components/wer-redirection"
 import { WerTextfieldProps } from "./components/wer-textfield";
 import { WerButton } from './components/wer-button';
 
 export interface WerTableProps {
     initialState: Array<WerRedirectionData>;
 }
+
+const ajaxUrl : string = (window as any).ajaxurl;
+
 export class WerTable extends React.Component<WerTableProps> {
 
     private setStore : (args: WerTextfieldProps, e: React.ChangeEvent<HTMLInputElement>) => void;
@@ -20,6 +22,8 @@ export class WerTable extends React.Component<WerTableProps> {
     private createRedirection: () => void;
     private deleteRedirection: (id: string) => void;
     private validateStore: (store : Array<WerRedirectionData>) => Array<WerRedirectionData>;
+    private validateLoad: (store : Array<WerRedirectionData>) => Array<WerRedirectionData>;
+    private saveStore: CallableFunction;
     public state: WerContextInterface;
 
     constructor(props) {
@@ -64,21 +68,53 @@ export class WerTable extends React.Component<WerTableProps> {
                     redirection.warningRequestDuplication = false;
                 }
                 return redirection
-            }, this)
+            })
             return validatedStore;
         }
 
+        this.validateLoad= (store) => {
+            const validatedLoad: Array<WerRedirectionData> = store.map((redirection) => {
+                if (!redirection.id || redirection.id === '') redirection.id = v4();
+                return redirection
+            })
+            return this.validateStore(validatedLoad);
+        }
+
         this.state = {
-            store: this.validateStore(this.props.initialState),
+            store: this.validateLoad(this.props.initialState),
             setStore: this.setStore,
             getRedirection: this.getRedirection,
-            deleteRedirection: this.deleteRedirection
+            deleteRedirection: this.deleteRedirection,
+            saving: false,
+            lastSave: null,
         }
 
         this.createRedirection = () => {
             var newState = this.state;
             newState.store.push({id: v4()})
             this.setState(newState);
+        }
+
+        this.saveStore = async () => {
+            this.setState({saving: true});
+            const init = {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json'
+                },
+                body: JSON.stringify(this.state.store)
+            }
+            let result: Response;
+            try {
+                result = await fetch(ajaxUrl+'?action=saveRedirects', init);
+            } catch (e) {
+                throw e;
+            }
+            this.setState({saving: false})
+            if (result.ok) {
+                const data = await result.json();
+                this.setState({lastSave: data});
+            }
         }
     }
 
@@ -104,7 +140,10 @@ export class WerTable extends React.Component<WerTableProps> {
             </tbody>
             <tfoot>
                 <tr>
-                    <th colSpan={5}><WerButton caption="Add new Redirection" callback={this.createRedirection} /></th>
+                    <th colSpan={5}>
+                        <WerButton caption="Add new Redirection" callback={this.createRedirection} />
+                        <WerButton caption="Save Redirections" callback={ async () => await this.saveStore()} />
+                    </th>
                 </tr>
             </tfoot>
         </table>
