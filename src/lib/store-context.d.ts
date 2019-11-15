@@ -10,6 +10,7 @@ export interface WerRedirectionsArray extends Array<WerRedirectionData> {
 }
 export interface WerContextInterface {
     store: WerRedirectionsArray;
+    wildcard: boolean;
     setStore: CallableFunction;
     getRedirection: CallableFunction;
     deleteRedirection: CallableFunction;

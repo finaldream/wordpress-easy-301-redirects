@@ -10,9 +10,10 @@ import { StoreContextProvider, WerRedirectionsArray, WerRedirectionData, WerCont
 import { WerListRedirections } from "./components/wer-list-redirections"
 import { WerTextfieldProps } from "./components/wer-textfield";
 import { WerButton } from './components/wer-button';
+import { CSSProperties } from "styled-components";
 
 export interface WerTableProps {
-    initialState: Array<WerRedirectionData>;
+    initialState: {wildcard: boolean, store: Array<WerRedirectionData>};
 }
 
 const ajaxUrl : string = (window as any).ajaxurl;
@@ -27,6 +28,7 @@ export class WerTable extends React.Component<WerTableProps> {
     private validateLoad: (store : Array<WerRedirectionData>) => Array<WerRedirectionData>;
     private showNotification: (type: TypeOptions, content: ToastContent, options?: ToastOptions) => React.ReactText;
     private saveStore: CallableFunction;
+    private toggleWildcard: (e: React.ChangeEvent<HTMLInputElement>) => void
     public state: WerContextInterface;
 
     constructor(props) {
@@ -89,33 +91,42 @@ export class WerTable extends React.Component<WerTableProps> {
                 } 
                 return redirection
             })
-            if (!valid) this.showNotification('info', 'Load Imported from other source! Please review and save your changes to commit');
+            if (!valid) this.showNotification('info', 'Data imported from old Simple301 plugin. Please review and save your changes to commit. After saving please deactivate the old plugin.');
             return this.validateStore(validatedLoad);
         }
 
         this.state = {
-            store: this.validateLoad(this.props.initialState),
+            store: this.validateLoad(this.props.initialState.store),
             setStore: this.setStore,
             getRedirection: this.getRedirection,
             deleteRedirection: this.deleteRedirection,
             saving: false,
             lastSave: null,
+            wildcard: this.props.initialState.wildcard,
         }
 
         this.createRedirection = () => {
             let newState = this.state;
-            newState.store.push({id: v4()})
+            newState.store.push({id: v4()});
+            this.setState(newState);
+        }
+
+        this.toggleWildcard = (e) => {
+            console.log(e.target.checked);
+            let newState = this.state;
+            newState.wildcard = !this.state.wildcard;
             this.setState(newState);
         }
 
         this.saveStore = async () => {
             this.setState({saving: true});
+            const payload = {wildcard: this.state.wildcard, store: this.state.store}
             const init = {
                 method: 'POST',
                 headers: {
                     'Content-Type': 'application/json'
                 },
-                body: JSON.stringify(this.state.store)
+                body: JSON.stringify(payload)
             }
             let result: Response;
             try {
@@ -125,7 +136,13 @@ export class WerTable extends React.Component<WerTableProps> {
                 return e;
             }
             if (result.ok) {
-                const json = await result.json();
+                let json: {data : {redirects_added: number, redirects_modified: number, redirects_deleted: number, store: Array<WerRedirectionData>}};
+                try {
+                    json = await result.json();
+                } catch (e) {
+                    this.showNotification('error', 'An Error ocurred! Changes not saved');
+                    return e;
+                }
                 if (json.data.redirects_added === 0 && json.data.redirects_modified === 0 && json.data.redirects_deleted === 0)
                 {
                     this.showNotification('warning', 'No changes were made!');
@@ -173,8 +190,12 @@ export class WerTable extends React.Component<WerTableProps> {
                     <tfoot>
                         <tr>
                             <th colSpan={5}>
-                                <WerButton caption="Add new Redirection" callback={this.createRedirection} />
+                                <WerButton caption="Add new Redirection" callback={this.createRedirection}/>
                                 <WerButton caption="Save Redirections" callback={this.saveStore} />
+                                <input type="checkbox" 
+                                    checked={this.state.wildcard}
+                                    onChange={this.toggleWildcard}/>
+                                <label htmlFor="e301r-wildcard" style={{marginLeft: '5px'}}>Use Wildcard?</label>
                             </th>
                         </tr>
                     </tfoot>

@@ -63,8 +63,11 @@ class Easy301RedirectsPlugin {
     {
         if ( !current_user_can('manage_options') )  { wp_send_json_error( 'You do not have sufficient permissions to access this page.', 403 ); }
 
-        $data = json_decode(file_get_contents('php://input'));
-        $redirects = $this->getRedirects();
+        $input = json_decode(file_get_contents('php://input'));
+        $data = $input->store;
+        $wildcard = $input->wildcard;
+        $currentState = $this->getRedirects();
+        $redirects = $currentState['store'];
         $result = [];
         $added = 0;
         $modified = 0;
@@ -86,12 +89,19 @@ class Easy301RedirectsPlugin {
                     }
                 }
             }
+            update_option('easy_301_redirects_wildcard', $wildcard);
             update_option('easy_301_redirects', $result);
         } catch (\Throwable $th) {
             wp_send_json_error( $th->getMessage(), 500 );
         }
 
-        wp_send_json_success(['redirects_added' => $added, 'redirects_modified' => $modified, 'redirects_deleted' => $deleted, 'store' => $result]);
+        wp_send_json_success([
+            'redirects_added' => $added,
+            'redirects_modified' => $modified,
+            'redirects_deleted' => $deleted,
+            'store' => $result,
+            'wildcard' => $wildcard
+            ]);
     }
 
     /**
@@ -132,10 +142,13 @@ class Easy301RedirectsPlugin {
     private function getRedirects() : array
     {
         $redirects = get_option('easy_301_redirects');
+        $wildcard = boolval(get_option('easy_301_redirects_wildcard'));
         if (empty($redirects)) {
-            $redirects = $this->migrateRedirectsFormat();
+            $result = $this->migrateRedirectsFormat();
+        } else {
+            $result = ['store' => $redirects, 'wildcard' => $wildcard];
         }
-        return $redirects ?? [];
+        return $result;
     }
 
     /**
@@ -150,13 +163,14 @@ class Easy301RedirectsPlugin {
     {
         $result = [];
         $redirects = get_option('301_redirects');
+        $wildcard = boolval(get_option('301_redirects_wildcard'));
         if (!empty($redirects)) {
             foreach ($redirects as $request => $destination) {
                 $redirection = new EasyRedirection($request, $destination, '', -1);
                 $result[] = $redirection;
             }
         }
-        return $result;
+        return ['store' => $result, 'wildcard' => $wildcard];
     }
 }
 

@@ -40736,6 +40736,7 @@ const React = __importStar(__webpack_require__(/*! react */ "./node_modules/reac
 ;
 const StoreContext = React.createContext({
     store: [],
+    wildcard: false,
     setStore: (props, e) => { },
     getRedirection: () => { },
     deleteRedirection: () => { },
@@ -40840,30 +40841,38 @@ class WerTable extends React.Component {
                 return redirection;
             });
             if (!valid)
-                this.showNotification('info', 'Load Imported from other source! Please review and save your changes to commit');
+                this.showNotification('info', 'Data imported from old Simple301 plugin. Please review and save your changes to commit. After saving please deactivate the old plugin.');
             return this.validateStore(validatedLoad);
         };
         this.state = {
-            store: this.validateLoad(this.props.initialState),
+            store: this.validateLoad(this.props.initialState.store),
             setStore: this.setStore,
             getRedirection: this.getRedirection,
             deleteRedirection: this.deleteRedirection,
             saving: false,
             lastSave: null,
+            wildcard: this.props.initialState.wildcard,
         };
         this.createRedirection = () => {
             let newState = this.state;
             newState.store.push({ id: uuid_1.v4() });
             this.setState(newState);
         };
+        this.toggleWildcard = (e) => {
+            console.log(e.target.checked);
+            let newState = this.state;
+            newState.wildcard = !this.state.wildcard;
+            this.setState(newState);
+        };
         this.saveStore = () => __awaiter(this, void 0, void 0, function* () {
             this.setState({ saving: true });
+            const payload = { wildcard: this.state.wildcard, store: this.state.store };
             const init = {
                 method: 'POST',
                 headers: {
                     'Content-Type': 'application/json'
                 },
-                body: JSON.stringify(this.state.store)
+                body: JSON.stringify(payload)
             };
             let result;
             try {
@@ -40874,7 +40883,14 @@ class WerTable extends React.Component {
                 return e;
             }
             if (result.ok) {
-                const json = yield result.json();
+                let json;
+                try {
+                    json = yield result.json();
+                }
+                catch (e) {
+                    this.showNotification('error', 'An Error ocurred! Changes not saved');
+                    return e;
+                }
                 if (json.data.redirects_added === 0 && json.data.redirects_modified === 0 && json.data.redirects_deleted === 0) {
                     this.showNotification('warning', 'No changes were made!');
                 }
@@ -40920,7 +40936,9 @@ class WerTable extends React.Component {
                     React.createElement("tr", null,
                         React.createElement("th", { colSpan: 5 },
                             React.createElement(wer_button_1.WerButton, { caption: "Add new Redirection", callback: this.createRedirection }),
-                            React.createElement(wer_button_1.WerButton, { caption: "Save Redirections", callback: this.saveStore }))))),
+                            React.createElement(wer_button_1.WerButton, { caption: "Save Redirections", callback: this.saveStore }),
+                            React.createElement("input", { type: "checkbox", checked: this.state.wildcard, onChange: this.toggleWildcard }),
+                            React.createElement("label", { htmlFor: "e301r-wildcard", style: { marginLeft: '5px' } }, "Use Wildcard?"))))),
             React.createElement(react_toastify_1.ToastContainer, { position: "bottom-right" })));
     }
 }

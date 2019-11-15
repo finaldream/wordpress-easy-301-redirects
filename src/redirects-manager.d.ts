@@ -2,7 +2,10 @@ import * as React from "react";
 import 'react-toastify/dist/ReactToastify.min.css';
 import { WerRedirectionData, WerContextInterface } from "./lib/store-context";
 export interface WerTableProps {
-    initialState: Array<WerRedirectionData>;
+    initialState: {
+        wildcard: boolean;
+        store: Array<WerRedirectionData>;
+    };
 }
 export declare class WerTable extends React.Component<WerTableProps> {
     private setStore;
@@ -13,6 +16,7 @@ export declare class WerTable extends React.Component<WerTableProps> {
     private validateLoad;
     private showNotification;
     private saveStore;
+    private toggleWildcard;
     state: WerContextInterface;
     constructor(props: any);
     static defaultProps: {
