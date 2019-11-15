@@ -2,6 +2,8 @@ import * as React from "react";
 import * as ReactDOM from "react-dom";
 import { v4 } from "uuid"
 import { mountComponent } from 'mount-component';
+import { ToastContainer, toast, ToastContent, ToastOptions, TypeOptions } from 'react-toastify';
+import 'react-toastify/dist/ReactToastify.min.css';
 
 import { StoreContextProvider, WerRedirectionsArray, WerRedirectionData, WerContextInterface } from "./lib/store-context";
 
@@ -23,6 +25,7 @@ export class WerTable extends React.Component<WerTableProps> {
     private deleteRedirection: (id: string) => void;
     private validateStore: (store : Array<WerRedirectionData>) => Array<WerRedirectionData>;
     private validateLoad: (store : Array<WerRedirectionData>) => Array<WerRedirectionData>;
+    private showNotification: (type: TypeOptions, content: ToastContent, options?: ToastOptions) => React.ReactText;
     private saveStore: CallableFunction;
     public state: WerContextInterface;
 
@@ -30,14 +33,14 @@ export class WerTable extends React.Component<WerTableProps> {
         super(props);
 
         this.setStore = (args: WerTextfieldProps, e: React.ChangeEvent<HTMLInputElement>) => {
-            var newStore = this.state.store;
+            let newStore = this.state.store;
             const redirection = newStore.filter((el) => {
                 return el.id === args.id;
             })[0];
             if (redirection) {
                 redirection[args.name] = e.target.value;
             }
-            var newState = this.state;
+            let newState = this.state;
             newState.store = this.validateStore(newStore);
             this.setState(newState);
         };
@@ -52,7 +55,7 @@ export class WerTable extends React.Component<WerTableProps> {
             const newStore = this.state.store.filter((el) => {
                 return el.id !== id;
             });
-            var newState = this.state;
+            let newState = this.state;
             newState.store = this.validateStore(newStore);
             this.setState(newState)
         }
@@ -72,11 +75,21 @@ export class WerTable extends React.Component<WerTableProps> {
             return validatedStore;
         }
 
+        this.showNotification = (type, content, options = {}) => {
+            options.type = type;
+            return toast(content, options);
+        }
+
         this.validateLoad= (store) => {
+            let valid = true;
             const validatedLoad: Array<WerRedirectionData> = store.map((redirection) => {
-                if (!redirection.id || redirection.id === '') redirection.id = v4();
+                if (!redirection.id || redirection.id === '') {
+                    redirection.id = v4();
+                    valid = false;
+                } 
                 return redirection
             })
+            if (!valid) this.showNotification('info', 'Load Imported from other source! Please review and save your changes to commit');
             return this.validateStore(validatedLoad);
         }
 
@@ -90,7 +103,7 @@ export class WerTable extends React.Component<WerTableProps> {
         }
 
         this.createRedirection = () => {
-            var newState = this.state;
+            let newState = this.state;
             newState.store.push({id: v4()})
             this.setState(newState);
         }
@@ -108,13 +121,33 @@ export class WerTable extends React.Component<WerTableProps> {
             try {
                 result = await fetch(ajaxUrl+'?action=saveRedirects', init);
             } catch (e) {
-                throw e;
+                this.showNotification('error', 'An Error ocurred! Changes not saved');
+                return e;
             }
-            this.setState({saving: false})
             if (result.ok) {
-                const data = await result.json();
-                this.setState({lastSave: data});
+                const json = await result.json();
+                if (json.data.redirects_added === 0 && json.data.redirects_modified === 0 && json.data.redirects_deleted === 0)
+                {
+                    this.showNotification('warning', 'No changes were made!');
+                } else {
+                    this.showNotification('success', ({msg}) => { 
+                        return (
+                        <div>Redirects Succesfully saved!<br/>
+                        Added: {json.data.redirects_added}<br/>
+                        Modified: {json.data.redirects_modified}<br/>
+                        Deleted: {json.data.redirects_deleted}</div>
+                        )
+                    });
+                }
+                let newState = this.state;
+                newState.store = this.validateStore(json.data.store);
+                newState.saving = false;
+                newState.lastSave = result.ok;
+                this.setState(newState);
+            } else {
+                this.showNotification('error', 'An Error ocurred! Changes not saved');
             }
+            return;
         }
     }
 
@@ -146,6 +179,7 @@ export class WerTable extends React.Component<WerTableProps> {
                         </tr>
                     </tfoot>
                 </table>
+                <ToastContainer position="bottom-right"/>
             </StoreContextProvider>
         )
     }

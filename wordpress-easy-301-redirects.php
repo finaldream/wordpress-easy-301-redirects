@@ -91,7 +91,7 @@ class Easy301RedirectsPlugin {
             wp_send_json_error( $th->getMessage(), 500 );
         }
 
-        wp_send_json_success(['redirects_added' => $added, 'redirects_modified' => $modified, 'redirects_deleted' => $deleted]);
+        wp_send_json_success(['redirects_added' => $added, 'redirects_modified' => $modified, 'redirects_deleted' => $deleted, 'store' => $result]);
     }
 
     /**
