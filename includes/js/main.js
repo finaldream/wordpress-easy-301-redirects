@@ -36747,6 +36747,15 @@ module.exports = v4;
 
 "use strict";
 
+var __awaiter = (this && this.__awaiter) || function (thisArg, _arguments, P, generator) {
+    function adopt(value) { return value instanceof P ? value : new P(function (resolve) { resolve(value); }); }
+    return new (P || (P = Promise))(function (resolve, reject) {
+        function fulfilled(value) { try { step(generator.next(value)); } catch (e) { reject(e); } }
+        function rejected(value) { try { step(generator["throw"](value)); } catch (e) { reject(e); } }
+        function step(result) { result.done ? resolve(result.value) : adopt(result.value).then(fulfilled, rejected); }
+        step((generator = generator.apply(thisArg, _arguments || [])).next());
+    });
+};
 var __importStar = (this && this.__importStar) || function (mod) {
     if (mod && mod.__esModule) return mod;
     var result = {};
@@ -36760,20 +36769,46 @@ var __importDefault = (this && this.__importDefault) || function (mod) {
 Object.defineProperty(exports, "__esModule", { value: true });
 const React = __importStar(__webpack_require__(/*! react */ "./node_modules/react/index.js"));
 const styled_components_1 = __importDefault(__webpack_require__(/*! styled-components */ "./node_modules/styled-components/dist/styled-components.browser.esm.js"));
-const BaseButton = ({ children, callback }) => (React.createElement("a", { className: "button", onClick: callback }, children));
+const BaseButton = ({ children, callback, disabled }) => (React.createElement("a", { className: "button", onClick: disabled ? (event) => event.preventDefault() : callback }, children));
 const StyledButton = styled_components_1.default(BaseButton) `
   border: 1px solid #000;
   background: gray;
+  margin: 5px;
+  padding: 5px;
 `;
+;
+;
 class WerButton extends React.Component {
+    constructor(props) {
+        super(props);
+        this.onClick = () => __awaiter(this, void 0, void 0, function* () {
+            this._isMounted && this.setState({ disabled: true, caption: 'Processing' });
+            const res = yield this.props.callback();
+            this._isMounted && this.setState({ disabled: this.props.disabled, caption: this.props.caption });
+            return res;
+        });
+        this._isMounted = false;
+        this.state = {
+            caption: this.props.caption,
+            disabled: this.props.disabled,
+        };
+    }
+    componentDidMount() {
+        this._isMounted = true;
+        this._isMounted && this.onClick.bind(this);
+    }
+    componentWillUnmount() {
+        this._isMounted = false;
+    }
     render() {
-        return (React.createElement(StyledButton, { callback: this.props.callback }, this.props.caption));
+        return (React.createElement(StyledButton, { callback: this.onClick, disabled: this.state.disabled }, this.state.caption));
     }
 }
 exports.WerButton = WerButton;
 WerButton.defaultProps = {
     caption: "Delete",
-    callback: () => { }
+    callback: () => { },
+    disabled: false,
 };
 
 
@@ -37054,21 +37089,21 @@ class WerTable extends React.Component {
         });
     }
     render() {
-        return (React.createElement("table", { className: "widefat" },
-            React.createElement("thead", null,
-                React.createElement("tr", null,
-                    React.createElement("th", { colSpan: 2 }, "Request"),
-                    React.createElement("th", null, "Destination"),
-                    React.createElement("th", null, "Last Modification"),
-                    React.createElement("th", null, "Action"))),
-            React.createElement("tbody", null,
-                React.createElement(store_context_1.StoreContextProvider, { value: this.state },
-                    React.createElement(wer_list_redirections_1.WerListRedirections, null))),
-            React.createElement("tfoot", null,
-                React.createElement("tr", null,
-                    React.createElement("th", { colSpan: 5 },
-                        React.createElement(wer_button_1.WerButton, { caption: "Add new Redirection", callback: this.createRedirection }),
-                        React.createElement(wer_button_1.WerButton, { caption: "Save Redirections", callback: () => __awaiter(this, void 0, void 0, function* () { return yield this.saveStore(); }) }))))));
+        return (React.createElement(store_context_1.StoreContextProvider, { value: this.state },
+            React.createElement("table", { className: "widefat" },
+                React.createElement("thead", null,
+                    React.createElement("tr", null,
+                        React.createElement("th", { colSpan: 2 }, "Request"),
+                        React.createElement("th", null, "Destination"),
+                        React.createElement("th", null, "Last Modification"),
+                        React.createElement("th", null, "Action"))),
+                React.createElement("tbody", null,
+                    React.createElement(wer_list_redirections_1.WerListRedirections, null)),
+                React.createElement("tfoot", null,
+                    React.createElement("tr", null,
+                        React.createElement("th", { colSpan: 5 },
+                            React.createElement(wer_button_1.WerButton, { caption: "Add new Redirection", callback: this.createRedirection }),
+                            React.createElement(wer_button_1.WerButton, { caption: "Save Redirections", callback: this.saveStore })))))));
     }
 }
 exports.WerTable = WerTable;

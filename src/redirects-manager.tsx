@@ -124,29 +124,29 @@ export class WerTable extends React.Component<WerTableProps> {
     
     public render(): JSX.Element {
         return (
-        <table className="widefat">
-            <thead>
-                <tr>
-                    <th colSpan={2} >Request</th>
-                    <th>Destination</th>
-                    <th>Last Modification</th>
-                    <th>Action</th>
-                </tr>
-            </thead>
-            <tbody>
-                <StoreContextProvider value={this.state}>
-                    <WerListRedirections />
-                </StoreContextProvider>
-            </tbody>
-            <tfoot>
-                <tr>
-                    <th colSpan={5}>
-                        <WerButton caption="Add new Redirection" callback={this.createRedirection} />
-                        <WerButton caption="Save Redirections" callback={ async () => await this.saveStore()} />
-                    </th>
-                </tr>
-            </tfoot>
-        </table>
+            <StoreContextProvider value={this.state}>
+                <table className="widefat">
+                    <thead>
+                        <tr>
+                            <th colSpan={2} >Request</th>
+                            <th>Destination</th>
+                            <th>Last Modification</th>
+                            <th>Action</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                            <WerListRedirections />
+                    </tbody>
+                    <tfoot>
+                        <tr>
+                            <th colSpan={5}>
+                                <WerButton caption="Add new Redirection" callback={this.createRedirection} />
+                                <WerButton caption="Save Redirections" callback={this.saveStore} />
+                            </th>
+                        </tr>
+                    </tfoot>
+                </table>
+            </StoreContextProvider>
         )
     }
 }
