@@ -9,7 +9,7 @@ export interface WerRedirectionData {
 export interface WerRedirectionsArray extends Array<WerRedirectionData> {
 }
 export interface WerContextInterface {
-    store: WerRedirectionsArray | null;
+    store: WerRedirectionsArray;
     setStore: CallableFunction;
     getRedirection: CallableFunction;
     deleteRedirection: CallableFunction;

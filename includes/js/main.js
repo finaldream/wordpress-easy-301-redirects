@@ -36801,8 +36801,10 @@ const store_context_1 = __webpack_require__(/*! ../lib/store-context */ "./src/l
 const wer_redirection_1 = __webpack_require__(/*! ./wer-redirection */ "./src/components/wer-redirection.tsx");
 class WerListRedirections extends React.Component {
     render() {
-        return (React.createElement(store_context_1.StoreContextConsumer, null, (context) => {
-            return (context.store.map(redirection => React.createElement(wer_redirection_1.WerRedirection, { key: redirection.id, id: redirection.id })));
+        return (React.createElement(store_context_1.StoreContextConsumer, null, ({ store }) => {
+            return store.map((redirection) => {
+                return (React.createElement(wer_redirection_1.WerRedirection, { key: redirection.id, id: redirection.id }));
+            });
         }));
     }
 }
@@ -36918,7 +36920,7 @@ const React = __importStar(__webpack_require__(/*! react */ "./node_modules/reac
 ;
 ;
 const StoreContext = React.createContext({
-    store: null,
+    store: [],
     setStore: (props, e) => { },
     getRedirection: () => { },
     deleteRedirection: () => { },

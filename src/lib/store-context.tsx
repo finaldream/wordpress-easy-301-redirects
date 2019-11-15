@@ -14,7 +14,7 @@ export interface WerRedirectionData {
 export interface WerRedirectionsArray extends Array<WerRedirectionData> { };
 
 export interface WerContextInterface {
-    store: WerRedirectionsArray|null, 
+    store: WerRedirectionsArray, 
     setStore : CallableFunction, 
     getRedirection : CallableFunction, 
     deleteRedirection : CallableFunction,
@@ -24,7 +24,7 @@ export interface WerContextInterface {
 };
 
 const StoreContext : React.Context<WerContextInterface> = React.createContext<WerContextInterface>({
-    store: null,
+    store: [],
     setStore: (props: WerTextfieldProps, e: React.ChangeEvent<HTMLInputElement>) => { },
     getRedirection: () => { },
     deleteRedirection: () => { },
