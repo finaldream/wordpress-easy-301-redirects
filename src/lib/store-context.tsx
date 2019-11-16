@@ -15,6 +15,7 @@ export interface WerRedirectionsArray extends Array<WerRedirectionData> { };
 
 export interface WerContextInterface {
     store: WerRedirectionsArray,
+    view:  (orderby?: 'order' | 'request' | 'destination' | 'modificationDate', sort?: 'asc' | 'desc' ) => Array<WerRedirectionData>,
     wildcard: boolean
     setStore : CallableFunction, 
     getRedirection : CallableFunction, 
@@ -26,6 +27,7 @@ export interface WerContextInterface {
 
 const StoreContext : React.Context<WerContextInterface> = React.createContext<WerContextInterface>({
     store: [],
+    view: () => [],
     wildcard: false,
     setStore: (props: WerTextfieldProps, e: React.ChangeEvent<HTMLInputElement>) => { },
     getRedirection: () => { },

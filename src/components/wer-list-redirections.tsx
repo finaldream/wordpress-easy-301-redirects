@@ -7,8 +7,8 @@ export class WerListRedirections extends React.Component {
     public render(): JSX.Element {
         return (
         <StoreContextConsumer>
-            { ({store}) => {
-                return store.map((redirection)=> {
+            { ({view}) => {
+                return view().map((redirection)=> {
                     return (
                         <WerRedirection 
                             key={redirection.id}

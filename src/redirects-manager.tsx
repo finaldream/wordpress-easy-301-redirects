@@ -1,16 +1,16 @@
-import * as React from "react";
-import * as ReactDOM from "react-dom";
-import { v4 } from "uuid"
+import * as React from 'react';
+
+import { v4 } from 'uuid'
 import { mountComponent } from 'mount-component';
 import { ToastContainer, toast, ToastContent, ToastOptions, TypeOptions } from 'react-toastify';
 import 'react-toastify/dist/ReactToastify.min.css';
 
-import { StoreContextProvider, WerRedirectionsArray, WerRedirectionData, WerContextInterface } from "./lib/store-context";
+import { StoreContextProvider, WerRedirectionsArray, WerRedirectionData, WerContextInterface } from './lib/store-context';
+import {sortByProperty, sortByMultipleProperties} from './lib/store-sorter';
 
-import { WerListRedirections } from "./components/wer-list-redirections"
-import { WerTextfieldProps } from "./components/wer-textfield";
+import { WerListRedirections } from './components/wer-list-redirections'
+import { WerTextfieldProps } from './components/wer-textfield';
 import { WerButton } from './components/wer-button';
-import { CSSProperties } from "styled-components";
 
 export interface WerTableProps {
     initialState: {wildcard: boolean, store: Array<WerRedirectionData>};
@@ -28,7 +28,8 @@ export class WerTable extends React.Component<WerTableProps> {
     private validateLoad: (store : Array<WerRedirectionData>) => Array<WerRedirectionData>;
     private showNotification: (type: TypeOptions, content: ToastContent, options?: ToastOptions) => React.ReactText;
     private saveStore: CallableFunction;
-    private toggleWildcard: (e: React.ChangeEvent<HTMLInputElement>) => void
+    private toggleWildcard: (e: React.ChangeEvent<HTMLInputElement>) => void;
+    private view: (orderby?: 'order' | 'request' | 'destination' | 'modificationDate', sort?: 'asc' | 'desc' ) => Array<WerRedirectionData>;
     public state: WerContextInterface;
 
     constructor(props) {
@@ -82,7 +83,7 @@ export class WerTable extends React.Component<WerTableProps> {
             return toast(content, options);
         }
 
-        this.validateLoad= (store) => {
+        this.validateLoad = (store) => {
             let valid = true;
             const validatedLoad: Array<WerRedirectionData> = store.map((redirection) => {
                 if (!redirection.id || redirection.id === '') {
@@ -95,8 +96,17 @@ export class WerTable extends React.Component<WerTableProps> {
             return this.validateStore(validatedLoad);
         }
 
+        this.view = (orderby = 'modificationDate', sort = 'asc') => {
+            const snapshot = [...this.state.store];
+            const result = snapshot.sort((a, b) => sortByMultipleProperties(a, b, [`-${orderby}`, 'order']));
+            if(sort === 'desc') result.reverse()
+            console.log(result);
+            return result;
+        }
+
         this.state = {
             store: this.validateLoad(this.props.initialState.store),
+            view: this.view,
             setStore: this.setStore,
             getRedirection: this.getRedirection,
             deleteRedirection: this.deleteRedirection,
@@ -175,7 +185,7 @@ export class WerTable extends React.Component<WerTableProps> {
     public render(): JSX.Element {
         return (
             <StoreContextProvider value={this.state}>
-                <table className="widefat">
+                <table className='widefat'>
                     <thead>
                         <tr>
                             <th colSpan={2} >Request</th>
@@ -190,17 +200,17 @@ export class WerTable extends React.Component<WerTableProps> {
                     <tfoot>
                         <tr>
                             <th colSpan={5}>
-                                <WerButton caption="Add new Redirection" callback={this.createRedirection}/>
-                                <WerButton caption="Save Redirections" callback={this.saveStore} />
-                                <input type="checkbox" 
+                                <WerButton caption='Add new Redirection' callback={this.createRedirection}/>
+                                <WerButton caption='Save Redirections' callback={this.saveStore} />
+                                <input type='checkbox' 
                                     checked={this.state.wildcard}
                                     onChange={this.toggleWildcard}/>
-                                <label htmlFor="e301r-wildcard" style={{marginLeft: '5px'}}>Use Wildcard?</label>
+                                <label htmlFor='e301r-wildcard' style={{marginLeft: '5px'}}>Use Wildcard?</label>
                             </th>
                         </tr>
                     </tfoot>
                 </table>
-                <ToastContainer position="bottom-right"/>
+                <ToastContainer position='bottom-right'/>
             </StoreContextProvider>
         )
     }
