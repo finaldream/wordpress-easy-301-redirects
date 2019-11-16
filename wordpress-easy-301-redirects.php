@@ -12,6 +12,7 @@ namespace WordpressEasy301Redirects;
 
 require_once(__DIR__.'/Easy301Redirection.php');
 use WordpressEasy301Redirects\EasyRedirection;
+use DateTime;
 
 
 class Easy301RedirectsPlugin {
@@ -73,6 +74,7 @@ class Easy301RedirectsPlugin {
         $modified = 0;
         try {
             $deleted = sizeof(array_udiff($redirects, $data, function($a, $b){ return strcmp($a->id, $b->id); } ));
+            $transcationTime = new DateTime();
             foreach ($data as $redirection) {
                 $found = array_filter($redirects, function($el) use ($redirection) { return $el->id === $redirection->id;} );
                 if($found) {
@@ -83,7 +85,7 @@ class Easy301RedirectsPlugin {
                     $result[] = $current;
                 } else {
                     if ($redirection->request && $redirection->destination && $redirection->id) {
-                        $new = new EasyRedirection($redirection->request, $redirection->destination, $redirection->id, sizeof($result));
+                        $new = new EasyRedirection($redirection->request, $redirection->destination, $redirection->id, sizeof($result), $transcationTime );
                         $result[] = $new;
                         $added++;
                     }

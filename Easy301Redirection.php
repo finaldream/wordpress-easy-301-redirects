@@ -25,12 +25,12 @@ class EasyRedirection implements Serializable, JsonSerializable
     /** @var int $order */
     private $order;
 
-    public function __construct(string $request, string $destination, string $uuid = '', int $order = 0) {       
+    public function __construct(string $request, string $destination, string $uuid = '', int $order = 0, DateTime $createdAt = null) {       
         $this->id = $uuid;
         $this->request = trim( sanitize_text_field($request) );
         $this->destination = trim( sanitize_text_field($destination) );
         $this->order = $order;
-        $this->createdAt = new DateTime();        
+        $this->createdAt = $createdAt ?? new DateTime();        
     }
 
     public function serialize() : string
