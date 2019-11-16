@@ -40713,6 +40713,54 @@ exports.WerTextfield = WerTextfield;
 
 /***/ }),
 
+/***/ "./src/components/wer-toolbar.tsx":
+/*!****************************************!*\
+  !*** ./src/components/wer-toolbar.tsx ***!
+  \****************************************/
+/*! no static exports found */
+/***/ (function(module, exports, __webpack_require__) {
+
+"use strict";
+
+var __importStar = (this && this.__importStar) || function (mod) {
+    if (mod && mod.__esModule) return mod;
+    var result = {};
+    if (mod != null) for (var k in mod) if (Object.hasOwnProperty.call(mod, k)) result[k] = mod[k];
+    result["default"] = mod;
+    return result;
+};
+var __importDefault = (this && this.__importDefault) || function (mod) {
+    return (mod && mod.__esModule) ? mod : { "default": mod };
+};
+Object.defineProperty(exports, "__esModule", { value: true });
+const React = __importStar(__webpack_require__(/*! react */ "./node_modules/react/index.js"));
+const styled_components_1 = __importDefault(__webpack_require__(/*! styled-components */ "./node_modules/styled-components/dist/styled-components.browser.esm.js"));
+const wer_button_1 = __webpack_require__(/*! ./wer-button */ "./src/components/wer-button.tsx");
+const store_context_1 = __webpack_require__(/*! ../lib/store-context */ "./src/lib/store-context.tsx");
+const SearchInput = styled_components_1.default.input `
+  padding: 5px !important;
+  width: 100%;
+`;
+class WerToolbar extends React.Component {
+    render() {
+        return (React.createElement(store_context_1.StoreContextConsumer, null, ({ createRedirection, saveStore, toggleWildcard, wildcard, setFilter, filterBy }) => {
+            return (React.createElement("div", { className: 'wer-toolbar' },
+                React.createElement("div", { className: 'alignleft actions' },
+                    React.createElement(wer_button_1.WerButton, { caption: 'Add new Redirection', callback: createRedirection }),
+                    React.createElement(wer_button_1.WerButton, { caption: 'Save Redirections', callback: saveStore }),
+                    React.createElement("input", { type: 'checkbox', name: 'e301r-wildcard', checked: wildcard, onChange: toggleWildcard }),
+                    React.createElement("label", { htmlFor: 'e301r-wildcard', style: { marginLeft: '5px' } }, "Use Wildcard?")),
+                React.createElement("div", { className: 'alignright actions', style: { display: 'flex' } },
+                    React.createElement("label", { htmlFor: 'wer-filterby', style: { marginRight: '5px', marginTop: '5px' } }, "Search: "),
+                    React.createElement(SearchInput, { type: 'text', defaultValue: filterBy, id: 'wer-filterby', name: 'wer-filterby', onChange: setFilter }))));
+        }));
+    }
+}
+exports.WerToolbar = WerToolbar;
+
+
+/***/ }),
+
 /***/ "./src/lib/store-context.tsx":
 /*!***********************************!*\
   !*** ./src/lib/store-context.tsx ***!
@@ -40741,8 +40789,13 @@ const StoreContext = React.createContext({
     setStore: (props, e) => { },
     getRedirection: () => { },
     deleteRedirection: () => { },
+    createRedirection: () => { },
+    saveStore: () => { },
+    toggleWildcard: () => { },
     saving: false,
-    lastSave: {}
+    lastSave: {},
+    filterBy: '',
+    setFilter: () => { },
 });
 exports.StoreContextProvider = StoreContext.Provider;
 exports.StoreContextConsumer = StoreContext.Consumer;
@@ -40766,6 +40819,8 @@ exports.sortByProperty = (a, b, property) => {
         sortOrder = -1;
         property = property.substr(1);
     }
+    if (!a[property] || !b[property])
+        return 1;
     return ((a[property] < b[property]) ? -1 : (a[property] > b[property]) ? 1 : 0) * sortOrder;
 };
 exports.sortByMultipleProperties = (a, b, properties) => {
@@ -40816,7 +40871,7 @@ __webpack_require__(/*! react-toastify/dist/ReactToastify.min.css */ "./node_mod
 const store_context_1 = __webpack_require__(/*! ./lib/store-context */ "./src/lib/store-context.tsx");
 const store_sorter_1 = __webpack_require__(/*! ./lib/store-sorter */ "./src/lib/store-sorter.ts");
 const wer_list_redirections_1 = __webpack_require__(/*! ./components/wer-list-redirections */ "./src/components/wer-list-redirections.tsx");
-const wer_button_1 = __webpack_require__(/*! ./components/wer-button */ "./src/components/wer-button.tsx");
+const wer_toolbar_1 = __webpack_require__(/*! ./components/wer-toolbar */ "./src/components/wer-toolbar.tsx");
 const ajaxUrl = window.ajaxurl;
 class WerTable extends React.Component {
     constructor(props) {
@@ -40878,23 +40933,23 @@ class WerTable extends React.Component {
                 this.showNotification('info', 'Data imported from old Simple301 plugin. Please review and save your changes to commit. After saving please deactivate the old plugin.');
             return this.validateStore(validatedLoad);
         };
-        this.view = (orderby = 'modificationDate', sort = 'asc') => {
-            const snapshot = [...this.state.store];
+        this.setFilter = (e) => {
+            let newState = this.state;
+            newState.filterBy = e.target.value;
+            this.setState(newState);
+        };
+        this.view = (orderby = 'modificationDate', sort = 'asc', filterBy = this.state.filterBy) => {
+            let snapshot = [...this.state.store];
+            if (filterBy !== '') {
+                snapshot = snapshot.filter((el) => {
+                    return ((el.request ? el.request.includes(filterBy) : true) ||
+                        (el.destination ? el.destination.includes(filterBy) : true));
+                });
+            }
             const result = snapshot.sort((a, b) => store_sorter_1.sortByMultipleProperties(a, b, [`-${orderby}`, 'order']));
             if (sort === 'desc')
                 result.reverse();
-            console.log(result);
             return result;
-        };
-        this.state = {
-            store: this.validateLoad(this.props.initialState.store),
-            view: this.view,
-            setStore: this.setStore,
-            getRedirection: this.getRedirection,
-            deleteRedirection: this.deleteRedirection,
-            saving: false,
-            lastSave: null,
-            wildcard: this.props.initialState.wildcard,
         };
         this.createRedirection = () => {
             let newState = this.state;
@@ -40902,7 +40957,6 @@ class WerTable extends React.Component {
             this.setState(newState);
         };
         this.toggleWildcard = (e) => {
-            console.log(e.target.checked);
             let newState = this.state;
             newState.wildcard = !this.state.wildcard;
             this.setState(newState);
@@ -40963,11 +41017,29 @@ class WerTable extends React.Component {
             }
             return;
         });
+        this.state = {
+            store: this.validateLoad(this.props.initialState.store),
+            view: this.view,
+            setStore: this.setStore,
+            getRedirection: this.getRedirection,
+            deleteRedirection: this.deleteRedirection,
+            saving: false,
+            filterBy: '',
+            setFilter: this.setFilter,
+            lastSave: null,
+            wildcard: this.props.initialState.wildcard,
+            createRedirection: this.createRedirection,
+            toggleWildcard: this.toggleWildcard,
+            saveStore: this.saveStore
+        };
     }
     render() {
         return (React.createElement(store_context_1.StoreContextProvider, { value: this.state },
             React.createElement("table", { className: 'widefat' },
                 React.createElement("thead", null,
+                    React.createElement("tr", null,
+                        React.createElement("th", { colSpan: 5 },
+                            React.createElement(wer_toolbar_1.WerToolbar, null))),
                     React.createElement("tr", null,
                         React.createElement("th", { colSpan: 2 }, "Request"),
                         React.createElement("th", null, "Destination"),
@@ -40978,10 +41050,7 @@ class WerTable extends React.Component {
                 React.createElement("tfoot", null,
                     React.createElement("tr", null,
                         React.createElement("th", { colSpan: 5 },
-                            React.createElement(wer_button_1.WerButton, { caption: 'Add new Redirection', callback: this.createRedirection }),
-                            React.createElement(wer_button_1.WerButton, { caption: 'Save Redirections', callback: this.saveStore }),
-                            React.createElement("input", { type: 'checkbox', checked: this.state.wildcard, onChange: this.toggleWildcard }),
-                            React.createElement("label", { htmlFor: 'e301r-wildcard', style: { marginLeft: '5px' } }, "Use Wildcard?"))))),
+                            React.createElement(wer_toolbar_1.WerToolbar, null))))),
             React.createElement(react_toastify_1.ToastContainer, { position: 'bottom-right' })));
     }
 }

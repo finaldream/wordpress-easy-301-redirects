@@ -10,7 +10,8 @@ import {sortByProperty, sortByMultipleProperties} from './lib/store-sorter';
 
 import { WerListRedirections } from './components/wer-list-redirections'
 import { WerTextfieldProps } from './components/wer-textfield';
-import { WerButton } from './components/wer-button';
+import { WerToolbar } from './components/wer-toolbar';
+import { EDEADLK } from 'constants';
 
 export interface WerTableProps {
     initialState: {wildcard: boolean, store: Array<WerRedirectionData>};
@@ -29,7 +30,8 @@ export class WerTable extends React.Component<WerTableProps> {
     private showNotification: (type: TypeOptions, content: ToastContent, options?: ToastOptions) => React.ReactText;
     private saveStore: CallableFunction;
     private toggleWildcard: (e: React.ChangeEvent<HTMLInputElement>) => void;
-    private view: (orderby?: 'order' | 'request' | 'destination' | 'modificationDate', sort?: 'asc' | 'desc' ) => Array<WerRedirectionData>;
+    private setFilter: (e: React.ChangeEvent<HTMLInputElement>) => void;
+    private view: (orderby?: 'order' | 'request' | 'destination' | 'modificationDate', sort?: 'asc' | 'desc', filterBy?: string ) => Array<WerRedirectionData>;
     public state: WerContextInterface;
 
     constructor(props) {
@@ -96,23 +98,25 @@ export class WerTable extends React.Component<WerTableProps> {
             return this.validateStore(validatedLoad);
         }
 
-        this.view = (orderby = 'modificationDate', sort = 'asc') => {
-            const snapshot = [...this.state.store];
-            const result = snapshot.sort((a, b) => sortByMultipleProperties(a, b, [`-${orderby}`, 'order']));
-            if(sort === 'desc') result.reverse()
-            console.log(result);
-            return result;
+        this.setFilter = (e: React.ChangeEvent<HTMLInputElement>) => {
+            let newState = this.state;
+            newState.filterBy = e.target.value;
+            this.setState(newState);
         }
 
-        this.state = {
-            store: this.validateLoad(this.props.initialState.store),
-            view: this.view,
-            setStore: this.setStore,
-            getRedirection: this.getRedirection,
-            deleteRedirection: this.deleteRedirection,
-            saving: false,
-            lastSave: null,
-            wildcard: this.props.initialState.wildcard,
+        this.view = (orderby = 'modificationDate', sort = 'asc', filterBy = this.state.filterBy) => {
+            let snapshot = [...this.state.store];
+            if (filterBy !== '') {
+                snapshot = snapshot.filter((el) => {
+                    return (
+                        (el.request ? el.request.includes(filterBy) : true) || 
+                        (el.destination ? el.destination.includes(filterBy) : true)
+                    );
+                })
+            }
+            const result = snapshot.sort((a, b) => sortByMultipleProperties(a, b, [`-${orderby}`, 'order']));
+            if(sort === 'desc') result.reverse();
+            return result;
         }
 
         this.createRedirection = () => {
@@ -122,7 +126,6 @@ export class WerTable extends React.Component<WerTableProps> {
         }
 
         this.toggleWildcard = (e) => {
-            console.log(e.target.checked);
             let newState = this.state;
             newState.wildcard = !this.state.wildcard;
             this.setState(newState);
@@ -176,6 +179,22 @@ export class WerTable extends React.Component<WerTableProps> {
             }
             return;
         }
+
+        this.state = {
+            store: this.validateLoad(this.props.initialState.store),
+            view: this.view,
+            setStore: this.setStore,
+            getRedirection: this.getRedirection,
+            deleteRedirection: this.deleteRedirection,
+            saving: false,
+            filterBy: '',
+            setFilter: this.setFilter,
+            lastSave: null,
+            wildcard: this.props.initialState.wildcard,
+            createRedirection: this.createRedirection,
+            toggleWildcard: this.toggleWildcard,
+            saveStore: this.saveStore
+        }
     }
 
     public static defaultProps = {
@@ -187,6 +206,11 @@ export class WerTable extends React.Component<WerTableProps> {
             <StoreContextProvider value={this.state}>
                 <table className='widefat'>
                     <thead>
+                        <tr>
+                            <th colSpan={5}>
+                                <WerToolbar />
+                            </th>
+                        </tr>
                         <tr>
                             <th colSpan={2} >Request</th>
                             <th>Destination</th>
@@ -200,12 +224,7 @@ export class WerTable extends React.Component<WerTableProps> {
                     <tfoot>
                         <tr>
                             <th colSpan={5}>
-                                <WerButton caption='Add new Redirection' callback={this.createRedirection}/>
-                                <WerButton caption='Save Redirections' callback={this.saveStore} />
-                                <input type='checkbox' 
-                                    checked={this.state.wildcard}
-                                    onChange={this.toggleWildcard}/>
-                                <label htmlFor='e301r-wildcard' style={{marginLeft: '5px'}}>Use Wildcard?</label>
+                                <WerToolbar />
                             </th>
                         </tr>
                     </tfoot>

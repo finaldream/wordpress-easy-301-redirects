@@ -20,8 +20,13 @@ export interface WerContextInterface {
     setStore : CallableFunction, 
     getRedirection : CallableFunction, 
     deleteRedirection : CallableFunction,
+    createRedirection: CallableFunction,
+    saveStore: CallableFunction,
+    toggleWildcard: (e: React.ChangeEvent<HTMLInputElement>) => void,
     saving: boolean,
-    lastSave: {}
+    lastSave: {},
+    filterBy: string,
+    setFilter: (e: React.ChangeEvent<HTMLInputElement>) => void,
 
 };
 
@@ -32,8 +37,13 @@ const StoreContext : React.Context<WerContextInterface> = React.createContext<We
     setStore: (props: WerTextfieldProps, e: React.ChangeEvent<HTMLInputElement>) => { },
     getRedirection: () => { },
     deleteRedirection: () => { },
+    createRedirection: () => { },
+    saveStore: () => { },
+    toggleWildcard: () => { },
     saving: false,
-    lastSave: {}
+    lastSave: {},
+    filterBy: '',
+    setFilter: () => { },
 
 })
 

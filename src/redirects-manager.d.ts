@@ -17,6 +17,7 @@ export declare class WerTable extends React.Component<WerTableProps> {
     private showNotification;
     private saveStore;
     private toggleWildcard;
+    private setFilter;
     private view;
     state: WerContextInterface;
     constructor(props: any);

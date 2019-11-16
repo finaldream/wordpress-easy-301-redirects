@@ -5,6 +5,7 @@ export const sortByProperty : ({}, {}, property: string ) => number = (a, b, pro
         sortOrder = -1
         property = property.substr(1);
     } 
+    if (!a[property] || !b[property] ) return 1;
     return ( (a[property] < b[property]) ? -1 : (a[property] > b[property]) ? 1 : 0 ) * sortOrder;    
 }
 

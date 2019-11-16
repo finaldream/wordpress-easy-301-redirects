@@ -15,8 +15,13 @@ export interface WerContextInterface {
     setStore: CallableFunction;
     getRedirection: CallableFunction;
     deleteRedirection: CallableFunction;
+    createRedirection: CallableFunction;
+    saveStore: CallableFunction;
+    toggleWildcard: (e: React.ChangeEvent<HTMLInputElement>) => void;
     saving: boolean;
     lastSave: {};
+    filterBy: string;
+    setFilter: (e: React.ChangeEvent<HTMLInputElement>) => void;
 }
 export declare const StoreContextProvider: React.Provider<WerContextInterface>;
 export declare const StoreContextConsumer: React.Consumer<WerContextInterface>;
