@@ -2,6 +2,11 @@
     "name": "wordpress-easy-301-redirects",
     "version": "1.0.0",
     "description": "Frontend component for wordpress-easy-301-redirects",
+    "scripts": {
+        "build": "./node_modules/webpack/bin/webpack.js",
+        "watch": "./node_modules/webpack/bin/webpack.js -w",
+        "test": "./node_modules/typescript/bin/tsc --noEmit"
+    },
     "dependencies": {
         "mount-component": "^1.3.0",
         "react": "^16.11.*",
