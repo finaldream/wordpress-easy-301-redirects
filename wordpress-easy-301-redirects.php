@@ -51,6 +51,44 @@ class Easy301RedirectsPlugin {
      * @return void
      */
     public function redirect() {
+        $userrequest = str_ireplace(get_option('home'),'',$this->getAddress());
+        $userrequest = rtrim($userrequest,'/');
+        $currentState = $this->getRedirects();
+        $redirects =  $currentState['store'];
+        $wildcard = $currentState['wildcard'];
+        if (!empty($redirects)) { 
+            $do_redirect = '';
+            foreach ($redirects as $easyRedirection) {
+                $storedrequest = $easyRedirection->getRequest();
+                $destination = $easyRedirection->getDestination();
+                if ($wildcard === 'true' && strpos($storedrequest,'*') !== false) {
+
+                    if ( strpos($userrequest, '/wp-login') !== 0 && strpos($userrequest, '/wp-admin') !== 0 ) {
+                        $storedrequest = str_replace('*','(.*)',$storedrequest);
+                        $pattern = '/^' . str_replace( '/', '\/', rtrim( $storedrequest, '/' ) ) . '/';
+                        $destination = str_replace('*','$1',$destination);
+                        $output = preg_replace($pattern, $destination, $userrequest);
+                        if ($output !== $userrequest) {
+                            $do_redirect = $output;
+                        }
+                    }
+                }
+                elseif(urldecode($userrequest) == rtrim($storedrequest,'/')) {
+                    $do_redirect = $destination;
+                }
+                
+                if ($do_redirect !== '' && trim($do_redirect,'/') !== trim($userrequest,'/')) {
+                    if (strpos($do_redirect,'/') === 0){
+                        $do_redirect = home_url().$do_redirect;
+                    }
+                    header ('HTTP/1.1 301 Moved Permanently');
+                    header ('Location: ' . $do_redirect);
+                    exit();
+                }
+                else { unset($redirects); }
+              
+            }
+        }
         return;
     }
 
