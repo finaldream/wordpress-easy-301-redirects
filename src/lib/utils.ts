@@ -1,18 +1,22 @@
 
 import * as React from "react";
-import { toast, ToastContent, ToastOptions, TypeOptions } from 'react-toastify';
+import { toast, ToastContent, ToastOptions, TypeOptions, Toast } from 'react-toastify';
 import { v4 } from 'uuid'
 
 import { RedirectionsStore, RedirectsManagerContextInterface } from './redirects-manager-context';
 
 const ajaxUrl : string = (window as any).ajaxurl;
 
-export const showNotification = (type: TypeOptions, content: ToastContent, options: ToastOptions = {}) => {
+type showNotification = (type: TypeOptions, content: ToastContent, options?: ToastOptions ) => React.ReactText;
+
+export const showNotification : showNotification = (type, content, options = {}) => {
     options.type = type;
     return toast(content, options);
 }
 
-export const validateLoad = (store: RedirectionsStore) => {
+type validatedLoad = (store: RedirectionsStore) => RedirectionsStore
+
+export const validateLoad : validatedLoad = (store) => {
     let valid = true;
     const validatedLoad: RedirectionsStore = store.map((redirection) => {
         if (!redirection.id || redirection.id === '') {
@@ -25,7 +29,9 @@ export const validateLoad = (store: RedirectionsStore) => {
     return validatedLoad;
 }
 
-export const saveState = async (state : RedirectsManagerContextInterface) => {
+type saveState = (state : RedirectsManagerContextInterface) => Promise<RedirectsManagerContextInterface>
+
+export const saveState : saveState = async (state) => {
     const payload = {wildcard: state.wildcard, store: state.store}
     const init = {
         method: 'POST',
@@ -66,4 +72,29 @@ export const saveState = async (state : RedirectsManagerContextInterface) => {
         showNotification('error', 'An Error ocurred! Changes not saved');
         throw new Error(result.statusText);
     }
+}
+
+type sortByProperty = ({}, {}, property: string ) => number
+
+export const sortByProperty : sortByProperty = (a, b, property) => {
+    let sortOrder : -1|1 = 1;
+    if (property[0] === '-') {
+        sortOrder = -1
+        property = property.substr(1);
+    }
+    if (!a[property] || !b[property] ) return 0;
+    return ( (a[property] < b[property]) ? -1 : (a[property] > b[property]) ? 1 : 0 ) * sortOrder;    
+}
+
+type sortByMultipleProperties = ({}, {}, properties: Array<string> ) => number
+
+export const sortByMultipleProperties : sortByMultipleProperties = (a, b, properties) => {
+    let i = 0;
+    let result = 0;
+    let numberOfProperties = properties.length;
+    while (result === 0 && i < numberOfProperties) {
+        result = sortByProperty(a,b, properties[i]);
+        i++;
+    }
+    return result;
 }

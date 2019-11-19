@@ -49,7 +49,7 @@ const redirectsManagerReduducer = (state: RedirectsManagerContextInterface, acti
     switch (action.type) {
 
         case 'add': {
-            state.store.push({id: v4()});
+            state.store.push({id: v4(), modificationDate: 'not saved'});
             return {...state, lastModification: new Date};
         }
         

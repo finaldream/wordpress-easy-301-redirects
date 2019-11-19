@@ -13,8 +13,6 @@ import { useRedirectsManagerDispatch,
 
 import { validateLoad } from './lib/utils';
 
-import {sortByProperty, sortByMultipleProperties} from './lib/store-sorter';
-
 import { ListRedirections } from './components/list-redirections'
 import { Toolbar } from './components/toolbar';
 

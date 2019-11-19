@@ -69774,10 +69774,25 @@ var __importStar = (this && this.__importStar) || function (mod) {
 Object.defineProperty(exports, "__esModule", { value: true });
 const React = __importStar(__webpack_require__(/*! react */ "./node_modules/react/index.js"));
 const redirects_manager_context_1 = __webpack_require__(/*! ../lib/redirects-manager-context */ "./src/lib/redirects-manager-context.tsx");
+const utils_1 = __webpack_require__(/*! ../lib/utils */ "./src/lib/utils.ts");
 const redirection_1 = __webpack_require__(/*! ./redirection */ "./src/components/redirection.tsx");
+const getView = (state, orderby = 'modificationDate', sort = 'asc') => {
+    let view = [...state.store];
+    if (state.filterBy && state.filterBy !== '') {
+        view = view.filter((el) => {
+            return ((el.request ? el.request.includes(state.filterBy) : true) ||
+                (el.destination ? el.destination.includes(state.filterBy) : true));
+        });
+    }
+    view = view.sort((a, b) => utils_1.sortByMultipleProperties(a, b, [`-${orderby}`, 'order']));
+    if (sort === 'desc')
+        view.reverse();
+    return view;
+};
 exports.ListRedirections = () => {
     const state = redirects_manager_context_1.useRedirectsManagerState();
-    return (React.createElement("tbody", null, state.store.map((redirection) => {
+    const view = getView(state);
+    return (React.createElement("tbody", null, view.map((redirection) => {
         return React.createElement(redirection_1.Redirection, { key: redirection.id, redirection: redirection });
     })));
 };
@@ -69929,7 +69944,7 @@ exports.updateServerState = ({ dispatch, state }) => __awaiter(void 0, void 0, v
 const redirectsManagerReduducer = (state, action) => {
     switch (action.type) {
         case 'add': {
-            state.store.push({ id: uuid_1.v4() });
+            state.store.push({ id: uuid_1.v4(), modificationDate: 'not saved' });
             return Object.assign(Object.assign({}, state), { lastModification: new Date });
         }
         case 'edit': {
@@ -70066,6 +70081,26 @@ exports.saveState = (state) => __awaiter(void 0, void 0, void 0, function* () {
         throw new Error(result.statusText);
     }
 });
+exports.sortByProperty = (a, b, property) => {
+    let sortOrder = 1;
+    if (property[0] === '-') {
+        sortOrder = -1;
+        property = property.substr(1);
+    }
+    if (!a[property] || !b[property])
+        return 0;
+    return ((a[property] < b[property]) ? -1 : (a[property] > b[property]) ? 1 : 0) * sortOrder;
+};
+exports.sortByMultipleProperties = (a, b, properties) => {
+    let i = 0;
+    let result = 0;
+    let numberOfProperties = properties.length;
+    while (result === 0 && i < numberOfProperties) {
+        result = exports.sortByProperty(a, b, properties[i]);
+        i++;
+    }
+    return result;
+};
 
 
 /***/ }),
