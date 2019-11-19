@@ -39,7 +39,7 @@ export const saveState = async (state : RedirectsManagerContextInterface) => {
         result = await fetch(ajaxUrl+'?action=saveRedirects', init);
     } catch (e) {
         this.showNotification('error', 'An Error ocurred! Changes not saved');
-        return e;
+        throw e;
     }
     if (result.ok) {
         let json: {data : {redirects_added: number, redirects_modified: number, redirects_deleted: number, store: RedirectionsStore}};
@@ -47,26 +47,23 @@ export const saveState = async (state : RedirectsManagerContextInterface) => {
             json = await result.json();
         } catch (e) {
             showNotification('error', 'An Error ocurred! Changes not saved');
-            return e;
+            throw e;
         }
         if (json.data.redirects_added === 0 && json.data.redirects_modified === 0 && json.data.redirects_deleted === 0)
         {
             showNotification('warning', 'No changes were made!');
         } else {
             showNotification('success', `
-            <div>Redirects Succesfully saved!<br/>
-            Added: ${json.data.redirects_added}<br/>
-            Modified: ${json.data.redirects_modified}<br/>
-            Deleted: ${json.data.redirects_deleted}</div>
+            Redirects Succesfully saved!\n
+            Added: ${json.data.redirects_added}\n
+            Modified: ${json.data.redirects_modified}\n
+            Deleted: ${json.data.redirects_deleted}\n
             `);
         }
-        let newState = this.state;
-        newState.store = this.validateStore(json.data.store);
-        newState.saving = false;
-        newState.lastSave = result.ok;
-        this.setState(newState);
+        const final : RedirectsManagerContextInterface = {...state, store: json.data.store};
+        return final;
     } else {
         showNotification('error', 'An Error ocurred! Changes not saved');
+        throw new Error(result.statusText);
     }
-    return;
 }

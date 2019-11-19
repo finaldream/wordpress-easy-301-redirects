@@ -69818,7 +69818,7 @@ exports.Redirection = ({ redirection }) => {
     const handleEdition = (e) => dispatch({ type: 'edit', value: Object.assign(Object.assign({}, redirection), { [e.target.name]: e.target.value }) });
     return (React.createElement("tr", null,
         React.createElement("td", null,
-            React.createElement(Input, { type: 'text', name: "redirection", defaultValue: redirection.request, onChange: (e) => handleEdition(e) })),
+            React.createElement(Input, { type: 'text', name: "request", defaultValue: redirection.request, onChange: (e) => handleEdition(e) })),
         React.createElement("td", null, "\u00BB"),
         React.createElement("td", null,
             React.createElement(Input, { type: 'text', name: "destination", defaultValue: redirection.destination, onChange: (e) => handleEdition(e) })),
@@ -69863,7 +69863,8 @@ const AddNew = () => {
 };
 const Save = () => {
     const dispatch = redirects_manager_context_1.useRedirectsManagerDispatch();
-    return (React.createElement("a", { className: "button", onClick: (e) => dispatch({ type: 'add', value: null }) }, "Save Redirections"));
+    const state = redirects_manager_context_1.useRedirectsManagerState();
+    return (React.createElement("a", { className: "button", onClick: (e) => redirects_manager_context_1.updateServerState({ dispatch, state }) }, "Save Redirections"));
 };
 exports.Toolbar = () => {
     const state = redirects_manager_context_1.useRedirectsManagerState();
@@ -69891,6 +69892,15 @@ exports.Toolbar = () => {
 
 "use strict";
 
+var __awaiter = (this && this.__awaiter) || function (thisArg, _arguments, P, generator) {
+    function adopt(value) { return value instanceof P ? value : new P(function (resolve) { resolve(value); }); }
+    return new (P || (P = Promise))(function (resolve, reject) {
+        function fulfilled(value) { try { step(generator.next(value)); } catch (e) { reject(e); } }
+        function rejected(value) { try { step(generator["throw"](value)); } catch (e) { reject(e); } }
+        function step(result) { result.done ? resolve(result.value) : adopt(result.value).then(fulfilled, rejected); }
+        step((generator = generator.apply(thisArg, _arguments || [])).next());
+    });
+};
 var __importStar = (this && this.__importStar) || function (mod) {
     if (mod && mod.__esModule) return mod;
     var result = {};
@@ -69901,11 +69911,22 @@ var __importStar = (this && this.__importStar) || function (mod) {
 Object.defineProperty(exports, "__esModule", { value: true });
 const React = __importStar(__webpack_require__(/*! react */ "./node_modules/react/index.js"));
 const uuid_1 = __webpack_require__(/*! uuid */ "./node_modules/uuid/index.js");
+const utils_1 = __webpack_require__(/*! ./utils */ "./src/lib/utils.ts");
 ;
 ;
 const RedirectsManagerContext = React.createContext(undefined);
 const RedirectsManagerDispatchContext = React.createContext(undefined);
-exports.redirectsManagerReduducer = (state, action) => {
+exports.updateServerState = ({ dispatch, state }) => __awaiter(void 0, void 0, void 0, function* () {
+    dispatch({ type: 'saving-state', value: true });
+    try {
+        const newState = yield utils_1.saveState(state);
+        dispatch({ type: 'set', value: Object.assign(Object.assign({}, newState), { lastSave: new Date, saving: false }) });
+    }
+    catch (e) {
+        dispatch({ type: 'saving-state', value: false });
+    }
+});
+const redirectsManagerReduducer = (state, action) => {
     switch (action.type) {
         case 'add': {
             state.store.push({ id: uuid_1.v4() });
@@ -69917,21 +69938,21 @@ exports.redirectsManagerReduducer = (state, action) => {
             });
             state.store[index] = action.value;
             state.lastModification = new Date;
-            return state;
+            return Object.assign({}, state);
         }
         case 'remove': {
-            const newStore = state.store.filter((el) => {
+            state.store = state.store.filter((el) => {
                 return el.id !== action.value.id;
             });
-            state.store = newStore;
             state.lastModification = new Date;
-            return state;
+            return Object.assign({}, state);
         }
         case 'set': {
             return action.value;
         }
-        case 'save': {
-            break;
+        case 'saving-state': {
+            state.saving = action.value;
+            return state;
         }
         default: {
             throw new Error(`Unhandled action type`);
@@ -69939,7 +69960,7 @@ exports.redirectsManagerReduducer = (state, action) => {
     }
 };
 exports.RedirectsManagerProvider = ({ children }) => {
-    const [state, dispatch] = React.useReducer(exports.redirectsManagerReduducer, { store: [], wildcard: false });
+    const [state, dispatch] = React.useReducer(redirectsManagerReduducer, { store: [], wildcard: false });
     return (React.createElement(RedirectsManagerContext.Provider, { value: state },
         React.createElement(RedirectsManagerDispatchContext.Provider, { value: dispatch }, children)));
 };
@@ -70015,7 +70036,7 @@ exports.saveState = (state) => __awaiter(void 0, void 0, void 0, function* () {
     }
     catch (e) {
         this.showNotification('error', 'An Error ocurred! Changes not saved');
-        return e;
+        throw e;
     }
     if (result.ok) {
         let json;
@@ -70024,29 +70045,26 @@ exports.saveState = (state) => __awaiter(void 0, void 0, void 0, function* () {
         }
         catch (e) {
             exports.showNotification('error', 'An Error ocurred! Changes not saved');
-            return e;
+            throw e;
         }
         if (json.data.redirects_added === 0 && json.data.redirects_modified === 0 && json.data.redirects_deleted === 0) {
             exports.showNotification('warning', 'No changes were made!');
         }
         else {
             exports.showNotification('success', `
-            <div>Redirects Succesfully saved!<br/>
-            Added: ${json.data.redirects_added}<br/>
-            Modified: ${json.data.redirects_modified}<br/>
-            Deleted: ${json.data.redirects_deleted}</div>
+            Redirects Succesfully saved!\n
+            Added: ${json.data.redirects_added}\n
+            Modified: ${json.data.redirects_modified}\n
+            Deleted: ${json.data.redirects_deleted}\n
             `);
         }
-        let newState = this.state;
-        newState.store = this.validateStore(json.data.store);
-        newState.saving = false;
-        newState.lastSave = result.ok;
-        this.setState(newState);
+        const final = Object.assign(Object.assign({}, state), { store: json.data.store });
+        return final;
     }
     else {
         exports.showNotification('error', 'An Error ocurred! Changes not saved');
+        throw new Error(result.statusText);
     }
-    return;
 });
 
 

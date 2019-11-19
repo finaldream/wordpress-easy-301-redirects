@@ -1,7 +1,7 @@
 import * as React from "react";
 import styled from "styled-components";
 
-import { useRedirectsManagerState, useRedirectsManagerDispatch } from '../lib/redirects-manager-context';
+import { useRedirectsManagerState, useRedirectsManagerDispatch, updateServerState } from '../lib/redirects-manager-context';
 
 const SearchInput = styled.input`
   padding: 1px !important;
@@ -19,8 +19,9 @@ const AddNew = () => {
 
 const Save = () => {
     const dispatch = useRedirectsManagerDispatch();
+    const state = useRedirectsManagerState();
     return (
-    <a className="button" onClick={(e) => dispatch({type: 'add', value: null})} >
+    <a className="button" onClick={(e) => updateServerState({dispatch, state})} >
       Save Redirections
     </a>
     )

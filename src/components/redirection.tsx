@@ -21,7 +21,7 @@ export const Redirection = ( {redirection} : RedirectionComponentProps ) => {
             <td>
                 <Input 
                     type='text'
-                    name="redirection"
+                    name="request"
                     defaultValue={redirection.request}
                     onChange={(e) => handleEdition(e)}
                 />
