@@ -2,8 +2,9 @@
 import * as React from "react";
 import { toast, ToastContent, ToastOptions, TypeOptions, Toast } from 'react-toastify';
 import { v4 } from 'uuid'
+import { countBy, transform } from 'lodash'
 
-import { RedirectionsStore, RedirectsManagerContextInterface } from './redirects-manager-context';
+import { RedirectionsStore, RedirectsManagerContextInterface, RedirectionProps } from './redirects-manager-context';
 
 const ajaxUrl : string = (window as any).ajaxurl;
 
@@ -67,7 +68,7 @@ export const saveState : saveState = async (state) => {
             `);
         }
         const final : RedirectsManagerContextInterface = {...state, store: json.data.store};
-        return final;
+        return checkRepeatedRequests(final);
     } else {
         showNotification('error', 'An Error ocurred! Changes not saved');
         throw new Error(result.statusText);
@@ -97,4 +98,14 @@ export const sortByMultipleProperties : sortByMultipleProperties = (a, b, proper
         i++;
     }
     return result;
+}
+
+type checkRepeatedRequests = ( state: RedirectsManagerContextInterface) => RedirectsManagerContextInterface
+
+export const checkRepeatedRequests : checkRepeatedRequests = (state) => {
+    const repeatedRequest : Array<string> = transform( countBy(state.store, (el) => el.request), (result, count, value) => {
+        if (count > 1) result.push(value)
+    }, [] )
+    state.store.map( el => el.warningRequestDuplication = repeatedRequest.includes(el.request));
+    return state;
 }

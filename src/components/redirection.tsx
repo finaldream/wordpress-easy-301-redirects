@@ -3,10 +3,14 @@ import styled from "styled-components";
 
 import { useRedirectsManagerDispatch, RedirectionProps } from '../lib/redirects-manager-context';
 
-const Input = styled.input`
+interface InputProps {
+    readonly warning?: boolean;
+}
+const Input = styled.input<InputProps>`
   padding: 2px;
   font-size: 0.9em;
   width: 100%;
+  border: ${props => props.warning ? '2px solid red !important' : '1px solid #ddd !important'};
 `;
 
 type RedirectionComponentProps = {
@@ -24,6 +28,7 @@ export const Redirection = ( {redirection} : RedirectionComponentProps ) => {
                     name="request"
                     defaultValue={redirection.request}
                     onChange={(e) => handleEdition(e)}
+                    warning={redirection.warningRequestDuplication}
                 />
             </td>
             <td>&raquo;</td>

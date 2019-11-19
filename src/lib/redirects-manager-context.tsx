@@ -1,6 +1,6 @@
 import * as React from 'react';
 import { v4 } from 'uuid';
-import { saveState } from './utils';
+import { saveState, checkRepeatedRequests } from './utils';
 
 export interface RedirectsManagerContextInterface {
     store: RedirectionsStore,
@@ -59,7 +59,7 @@ const redirectsManagerReduducer = (state: RedirectsManagerContextInterface, acti
             })
             state.store[index] = action.value;
             state.lastModification = new Date;
-            return {...state};
+            return {...checkRepeatedRequests(state)};
         }
 
         case 'remove': {
@@ -67,7 +67,7 @@ const redirectsManagerReduducer = (state: RedirectsManagerContextInterface, acti
                 return el.id !== action.value.id;
             });
             state.lastModification = new Date;
-            return {...state};
+            return {...checkRepeatedRequests(state)};
         }
 
         case 'set': {

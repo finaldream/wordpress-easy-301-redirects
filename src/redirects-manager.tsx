@@ -11,7 +11,7 @@ import { useRedirectsManagerDispatch,
          RedirectionsStore
         } from './lib/redirects-manager-context';
 
-import { validateLoad } from './lib/utils';
+import { validateLoad, checkRepeatedRequests } from './lib/utils';
 
 import { ListRedirections } from './components/list-redirections'
 import { Toolbar } from './components/toolbar';
@@ -69,7 +69,7 @@ export class RedirectsManager extends React.Component<RedirectsManagerProps> {
         const validatedStote = validateLoad(this.props.initialState.store);
         return (                   
         <RedirectsManagerProvider>
-            <RedirectsManagerComponent initialState={{...this.props.initialState, store: validatedStote}} />
+            <RedirectsManagerComponent initialState={checkRepeatedRequests({...this.props.initialState, store: validatedStote})} />
             <ToastContainer position='bottom-right'/>
         </RedirectsManagerProvider>
         )

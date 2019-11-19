@@ -8,6 +8,7 @@
         "test": "./node_modules/typescript/bin/tsc --noEmit"
     },
     "dependencies": {
+        "lodash": "^4.17.15",
         "mount-component": "^1.3.0",
         "react": "^16.11.*",
         "react-dom": "^16.11.*",
@@ -16,6 +17,7 @@
         "uuid": "^3.3.3"
     },
     "devDependencies": {
+        "@types/lodash": "^4.14.149",
         "@types/react": "^16.9.11",
         "@types/react-dom": "^16.9.4",
         "@types/styled-components": "^4.1.22",
