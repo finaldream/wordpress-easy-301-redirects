@@ -9,6 +9,8 @@ export interface RedirectsManagerContextInterface {
     lastSave?: Date,
     lastModification?: Date,
     filterBy?: string,
+    perPage?: number,
+    currentPage?: number,
 }
 
 export interface RedirectionProps {

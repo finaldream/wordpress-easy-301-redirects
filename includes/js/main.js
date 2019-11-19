@@ -86956,6 +86956,7 @@ const React = __importStar(__webpack_require__(/*! react */ "./node_modules/reac
 const redirects_manager_context_1 = __webpack_require__(/*! ../lib/redirects-manager-context */ "./src/lib/redirects-manager-context.tsx");
 const utils_1 = __webpack_require__(/*! ../lib/utils */ "./src/lib/utils.ts");
 const redirection_1 = __webpack_require__(/*! ./redirection */ "./src/components/redirection.tsx");
+const paginator_1 = __webpack_require__(/*! ./paginator */ "./src/components/paginator.tsx");
 const getView = (state, orderby = 'modificationDate', sort = 'asc') => {
     let view = [...state.store];
     if (state.filterBy && state.filterBy !== '') {
@@ -86969,12 +86970,69 @@ const getView = (state, orderby = 'modificationDate', sort = 'asc') => {
         view.reverse();
     return view;
 };
+const getPageNumbers = (state) => {
+    const pageNumbers = [];
+    const totalRedirections = state.store.length;
+    const perPage = state.perPage ? state.perPage : totalRedirections;
+    for (let i = 1; i <= Math.ceil(totalRedirections / perPage); i++) {
+        pageNumbers.push(i);
+    }
+    return pageNumbers;
+};
+const paginateView = (state, store) => {
+    const perPage = state.perPage ? state.perPage : store.length;
+    const currentPage = state.currentPage ? state.currentPage : 1;
+    return store.slice((currentPage - 1) * perPage, (currentPage * perPage));
+};
 exports.ListRedirections = () => {
     const state = redirects_manager_context_1.useRedirectsManagerState();
-    const view = getView(state);
-    return (React.createElement("tbody", null, view.map((redirection) => {
-        return React.createElement(redirection_1.Redirection, { key: redirection.id, redirection: redirection });
+    const nonPaginatedView = getView(state);
+    const view = paginateView(state, nonPaginatedView);
+    return (React.createElement("tbody", null,
+        view.map((redirection) => {
+            return React.createElement(redirection_1.Redirection, { key: redirection.id, redirection: redirection });
+        }),
+        React.createElement(paginator_1.Paginator, { view: view, pageNumbers: getPageNumbers(state), totalStore: state.store.length })));
+};
+
+
+/***/ }),
+
+/***/ "./src/components/paginator.tsx":
+/*!**************************************!*\
+  !*** ./src/components/paginator.tsx ***!
+  \**************************************/
+/*! no static exports found */
+/***/ (function(module, exports, __webpack_require__) {
+
+"use strict";
+
+var __importStar = (this && this.__importStar) || function (mod) {
+    if (mod && mod.__esModule) return mod;
+    var result = {};
+    if (mod != null) for (var k in mod) if (Object.hasOwnProperty.call(mod, k)) result[k] = mod[k];
+    result["default"] = mod;
+    return result;
+};
+Object.defineProperty(exports, "__esModule", { value: true });
+const React = __importStar(__webpack_require__(/*! react */ "./node_modules/react/index.js"));
+const redirects_manager_context_1 = __webpack_require__(/*! ../lib/redirects-manager-context */ "./src/lib/redirects-manager-context.tsx");
+const NumberedButtons = ({ pageNumbers }) => {
+    const state = redirects_manager_context_1.useRedirectsManagerState();
+    const dispatch = redirects_manager_context_1.useRedirectsManagerDispatch();
+    return (React.createElement("div", null, pageNumbers.map((value) => {
+        return React.createElement("a", { type: 'button', onClick: () => dispatch({ type: 'set', value: Object.assign(Object.assign({}, state), { currentPage: value, filterBy: '' }) }) }, value);
     })));
+};
+exports.Paginator = ({ view, pageNumbers, totalStore }) => {
+    return (React.createElement("tr", null,
+        React.createElement("th", { colSpan: 5 },
+            React.createElement("hr", null),
+            "Viewing ",
+            view.length,
+            " Redirects of ",
+            totalStore,
+            React.createElement(NumberedButtons, { pageNumbers: pageNumbers }))));
 };
 
 
@@ -87327,7 +87385,8 @@ const RedirectsManagerComponent = ({ initialState }) => {
         React.createElement("thead", null,
             React.createElement("tr", null,
                 React.createElement("th", { colSpan: 5 },
-                    React.createElement(toolbar_1.Toolbar, null))),
+                    React.createElement(toolbar_1.Toolbar, null)))),
+        React.createElement("thead", null,
             React.createElement("tr", null,
                 React.createElement("th", { colSpan: 2 }, "Request"),
                 React.createElement("th", null, "Destination"),
@@ -87346,7 +87405,7 @@ class RedirectsManager extends React.Component {
     render() {
         const validatedStote = utils_1.validateLoad(this.props.initialState.store);
         return (React.createElement(redirects_manager_context_1.RedirectsManagerProvider, null,
-            React.createElement(RedirectsManagerComponent, { initialState: utils_1.checkRepeatedRequests(Object.assign(Object.assign({}, this.props.initialState), { store: validatedStote })) }),
+            React.createElement(RedirectsManagerComponent, { initialState: utils_1.checkRepeatedRequests(Object.assign(Object.assign({}, this.props.initialState), { store: validatedStote, perPage: 10 })) }),
             React.createElement(react_toastify_1.ToastContainer, { position: 'bottom-right' })));
     }
 }

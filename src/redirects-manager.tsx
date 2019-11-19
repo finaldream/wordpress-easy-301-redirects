@@ -4,11 +4,8 @@ import { ToastContainer } from 'react-toastify';
 import 'react-toastify/dist/ReactToastify.min.css';
 
 import { useRedirectsManagerDispatch, 
-         useRedirectsManagerState, 
          RedirectsManagerProvider, 
          RedirectsManagerContextInterface,
-         RedirectionProps,
-         RedirectionsStore
         } from './lib/redirects-manager-context';
 
 import { validateLoad, checkRepeatedRequests } from './lib/utils';
@@ -34,6 +31,8 @@ const RedirectsManagerComponent = ( { initialState } : RedirectsManagerComponent
                         <Toolbar />
                     </th>
                 </tr>
+            </thead>
+            <thead>
                 <tr>
                     <th colSpan={2} >Request</th>
                     <th>Destination</th>
@@ -69,7 +68,7 @@ export class RedirectsManager extends React.Component<RedirectsManagerProps> {
         const validatedStote = validateLoad(this.props.initialState.store);
         return (                   
         <RedirectsManagerProvider>
-            <RedirectsManagerComponent initialState={checkRepeatedRequests({...this.props.initialState, store: validatedStote})} />
+            <RedirectsManagerComponent initialState={checkRepeatedRequests({...this.props.initialState, store: validatedStote, perPage: 10})} />
             <ToastContainer position='bottom-right'/>
         </RedirectsManagerProvider>
         )
