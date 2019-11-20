@@ -87115,17 +87115,9 @@ var __importStar = (this && this.__importStar) || function (mod) {
     result["default"] = mod;
     return result;
 };
-var __importDefault = (this && this.__importDefault) || function (mod) {
-    return (mod && mod.__esModule) ? mod : { "default": mod };
-};
 Object.defineProperty(exports, "__esModule", { value: true });
 const React = __importStar(__webpack_require__(/*! react */ "./node_modules/react/index.js"));
-const styled_components_1 = __importDefault(__webpack_require__(/*! styled-components */ "./node_modules/styled-components/dist/styled-components.browser.esm.js"));
 const redirects_manager_context_1 = __webpack_require__(/*! ../lib/redirects-manager-context */ "./src/lib/redirects-manager-context.tsx");
-const SearchInput = styled_components_1.default.input `
-  padding: 1px !important;
-  width: 100%;
-`;
 const AddNew = () => {
     const dispatch = redirects_manager_context_1.useRedirectsManagerDispatch();
     return (React.createElement("a", { className: "button", onClick: (e) => dispatch({ type: 'add', value: null }) }, "Add new Redirection"));
@@ -87138,15 +87130,18 @@ const Save = () => {
 exports.Toolbar = () => {
     const state = redirects_manager_context_1.useRedirectsManagerState();
     const dispatch = redirects_manager_context_1.useRedirectsManagerDispatch();
-    return (React.createElement("div", { className: 'wer-toolbar' },
-        React.createElement("div", { className: 'alignleft actions', style: { display: 'flex' } },
-            React.createElement(AddNew, null),
-            React.createElement(Save, null),
-            React.createElement("input", { type: 'checkbox', style: { marginTop: '5px' }, name: 'e301r-wildcard', checked: state.wildcard, onChange: () => dispatch({ type: 'set', value: Object.assign(Object.assign({}, state), { wildcard: !state.wildcard }) }) }),
-            React.createElement("label", { htmlFor: 'e301r-wildcard', style: { marginLeft: '5px', marginTop: '5px' } }, "Use Wildcard?")),
-        React.createElement("div", { className: 'alignright actions', style: { display: 'flex' } },
-            React.createElement("label", { htmlFor: 'wer-filterby', style: { marginRight: '5px', marginTop: '5px' } }, "Search: "),
-            React.createElement(SearchInput, { onChange: (e) => dispatch({ type: 'set', value: Object.assign(Object.assign({}, state), { filterBy: e.target.value, currentPage: 1 }) }), type: 'text', value: state.filterBy, id: 'wer-filterby', name: 'wer-filterby' }))));
+    return (React.createElement("thead", null,
+        React.createElement("tr", null,
+            React.createElement("th", { colSpan: 5 },
+                React.createElement("div", { className: 'wer-toolbar' },
+                    React.createElement("div", { className: 'alignleft actions', style: { display: 'flex' } },
+                        React.createElement(AddNew, null),
+                        React.createElement(Save, null),
+                        React.createElement("input", { type: 'checkbox', style: { marginTop: '5px' }, name: 'e301r-wildcard', checked: state.wildcard, onChange: () => dispatch({ type: 'set', value: Object.assign(Object.assign({}, state), { wildcard: !state.wildcard }) }) }),
+                        React.createElement("label", { htmlFor: 'e301r-wildcard', style: { marginLeft: '5px', marginTop: '5px' } }, "Use Wildcard?")),
+                    React.createElement("div", { className: 'alignright actions', style: { display: 'flex' } },
+                        React.createElement("label", { htmlFor: 'wer-filterby', style: { marginRight: '5px', marginTop: '5px' } }, "Search: "),
+                        React.createElement("input", { onChange: (e) => dispatch({ type: 'set', value: Object.assign(Object.assign({}, state), { filterBy: e.target.value, currentPage: 1 }) }), type: 'text', defaultValue: state.filterBy, style: { padding: '1px', width: '100%' }, id: 'wer-filterby', name: 'wer-filterby' })))))));
 };
 
 
@@ -87397,10 +87392,7 @@ const RedirectsManagerComponent = ({ initialState }) => {
     const dispatch = redirects_manager_context_1.useRedirectsManagerDispatch();
     dispatch({ type: 'set', value: initialState });
     return (React.createElement("table", { className: 'widefat', style: { width: '100%' } },
-        React.createElement("thead", null,
-            React.createElement("tr", null,
-                React.createElement("th", { colSpan: 5 },
-                    React.createElement(toolbar_1.Toolbar, null)))),
+        React.createElement(toolbar_1.Toolbar, null),
         React.createElement("thead", null,
             React.createElement("tr", null,
                 React.createElement("th", { style: { width: '41%' } }, "Request"),
@@ -87408,11 +87400,7 @@ const RedirectsManagerComponent = ({ initialState }) => {
                 React.createElement("th", { style: { width: '41%' } }, "Destination"),
                 React.createElement("th", { style: { width: '11%' } }, "Last Modification"),
                 React.createElement("th", { style: { width: '5%', textAlign: 'center' } }, "Action"))),
-        React.createElement(list_redirections_1.ListRedirections, null),
-        React.createElement("tfoot", null,
-            React.createElement("tr", null,
-                React.createElement("th", { colSpan: 5 },
-                    React.createElement(toolbar_1.Toolbar, null))))));
+        React.createElement(list_redirections_1.ListRedirections, null)));
 };
 class RedirectsManager extends React.Component {
     constructor(props) {

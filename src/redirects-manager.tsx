@@ -25,13 +25,7 @@ const RedirectsManagerComponent = ( { initialState } : RedirectsManagerComponent
     dispatch({type: 'set', value: initialState})
     return ( 
         <table className='widefat' style={{width: '100%'}}>
-            <thead>
-                <tr>
-                    <th colSpan={5}>
-                        <Toolbar />
-                    </th>
-                </tr>
-            </thead>
+            <Toolbar />
             <thead>
                 <tr>
                     <th style={{width: '41%'}} >Request</th>
@@ -41,14 +35,7 @@ const RedirectsManagerComponent = ( { initialState } : RedirectsManagerComponent
                     <th style={{width: '5%', textAlign: 'center'}} >Action</th>
                 </tr>
             </thead>
-                <ListRedirections />
-            <tfoot>
-                <tr>
-                    <th colSpan={5}>
-                        <Toolbar />
-                    </th>
-                </tr>
-            </tfoot>
+            <ListRedirections />
         </table>
     )
 }
