@@ -22,18 +22,6 @@ const getView : getView = (state, orderby = 'modificationDate', sort = 'asc') =>
     return view;
 }
 
-type getPageNumbers = (state : RedirectsManagerContextInterface) => Array<number>;
-
-const getPageNumbers : getPageNumbers = (state) => {
-    const pageNumbers = [];
-    const totalRedirections = state.store.length;
-    const perPage = state.perPage ? state.perPage : totalRedirections;
-    for (let i = 1; i <= Math.ceil(totalRedirections / perPage); i++) {
-        pageNumbers.push(i);
-    }
-    return pageNumbers;
-} 
-
 type paginateView = (state : RedirectsManagerContextInterface, store: RedirectionsStore) => RedirectionsStore;
 
 const paginateView : paginateView = (state, store) => {
@@ -42,19 +30,18 @@ const paginateView : paginateView = (state, store) => {
     return store.slice((currentPage-1)*perPage, (currentPage*perPage) );
 }
 
-
 export const ListRedirections : React.FunctionComponent = () => {
     const state = useRedirectsManagerState();
-    const nonPaginatedView = getView(state);
-    const view = paginateView(state, nonPaginatedView);
+    const view = getView(state);
+    const paginated = paginateView(state, view);
     return (
         <tbody>
             {
-            view.map((redirection)=> {
+            paginated.map((redirection)=> {
                 return <Redirection key={redirection.id} redirection={redirection} />
             })
             }
-            <Paginator view={view} pageNumbers={getPageNumbers(state)} totalStore={state.store.length} />
+            <Paginator view={view} />
         </tbody>    
     )
 }

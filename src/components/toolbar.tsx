@@ -45,8 +45,8 @@ export const Toolbar : React.FunctionComponent = () => {
             <div className='alignright actions' style={{display: 'flex'}}>
                 <label htmlFor='wer-filterby' style={{marginRight: '5px', marginTop: '5px'}}>Search: </label>
                 <SearchInput 
-                    onChange={(e) => dispatch({type: 'set', value: {...state, filterBy: e.target.value}})}
-                    type='text' defaultValue={state.filterBy} id='wer-filterby' name='wer-filterby'/>
+                    onChange={(e) => dispatch({type: 'set', value: {...state, filterBy: e.target.value, currentPage: 1}})}
+                    type='text' value={state.filterBy} id='wer-filterby' name='wer-filterby'/>
             </div>
         </div>
     )

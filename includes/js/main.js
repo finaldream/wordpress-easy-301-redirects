@@ -86970,15 +86970,6 @@ const getView = (state, orderby = 'modificationDate', sort = 'asc') => {
         view.reverse();
     return view;
 };
-const getPageNumbers = (state) => {
-    const pageNumbers = [];
-    const totalRedirections = state.store.length;
-    const perPage = state.perPage ? state.perPage : totalRedirections;
-    for (let i = 1; i <= Math.ceil(totalRedirections / perPage); i++) {
-        pageNumbers.push(i);
-    }
-    return pageNumbers;
-};
 const paginateView = (state, store) => {
     const perPage = state.perPage ? state.perPage : store.length;
     const currentPage = state.currentPage ? state.currentPage : 1;
@@ -86986,13 +86977,13 @@ const paginateView = (state, store) => {
 };
 exports.ListRedirections = () => {
     const state = redirects_manager_context_1.useRedirectsManagerState();
-    const nonPaginatedView = getView(state);
-    const view = paginateView(state, nonPaginatedView);
+    const view = getView(state);
+    const paginated = paginateView(state, view);
     return (React.createElement("tbody", null,
-        view.map((redirection) => {
+        paginated.map((redirection) => {
             return React.createElement(redirection_1.Redirection, { key: redirection.id, redirection: redirection });
         }),
-        React.createElement(paginator_1.Paginator, { view: view, pageNumbers: getPageNumbers(state), totalStore: state.store.length })));
+        React.createElement(paginator_1.Paginator, { view: view })));
 };
 
 
@@ -87017,22 +87008,46 @@ var __importStar = (this && this.__importStar) || function (mod) {
 Object.defineProperty(exports, "__esModule", { value: true });
 const React = __importStar(__webpack_require__(/*! react */ "./node_modules/react/index.js"));
 const redirects_manager_context_1 = __webpack_require__(/*! ../lib/redirects-manager-context */ "./src/lib/redirects-manager-context.tsx");
+const getPageNumbers = (view, perPage) => {
+    const pageNumbers = [];
+    const totalRedirections = view.length;
+    const calculatedPerPage = perPage ? perPage : totalRedirections;
+    for (let i = 1; i <= Math.ceil(totalRedirections / calculatedPerPage); i++) {
+        pageNumbers.push(i);
+    }
+    return pageNumbers;
+};
+const validateSelectedPage = (input, max) => {
+    const page = Number(input);
+    if (page < 1)
+        return 1;
+    if (page > max)
+        return max;
+    return page;
+};
 const NumberedButtons = ({ pageNumbers }) => {
     const state = redirects_manager_context_1.useRedirectsManagerState();
     const dispatch = redirects_manager_context_1.useRedirectsManagerDispatch();
-    return (React.createElement("div", null, pageNumbers.map((value) => {
-        return React.createElement("a", { type: 'button', onClick: () => dispatch({ type: 'set', value: Object.assign(Object.assign({}, state), { currentPage: value, filterBy: '' }) }) }, value);
-    })));
+    const currentPage = state.currentPage ? state.currentPage : 1;
+    const lastPage = pageNumbers[pageNumbers.length - 1];
+    return (React.createElement("div", { className: 'alignright actions', style: { display: 'flex' } },
+        React.createElement("span", { style: { marginTop: '6px' } }, "Page "),
+        React.createElement("input", { type: "number", style: { width: '35px', background: 'transparent', cursor: 'default', border: 'none' }, min: pageNumbers[0], max: lastPage, value: currentPage, onChange: (e) => dispatch({ type: 'set', value: Object.assign(Object.assign({}, state), { currentPage: validateSelectedPage(e.target.value, lastPage) }) }) }),
+        React.createElement("span", { style: { marginLeft: '5px', marginTop: '6px' } },
+            "of ",
+            lastPage)));
 };
-exports.Paginator = ({ view, pageNumbers, totalStore }) => {
+exports.Paginator = ({ view }) => {
+    const state = redirects_manager_context_1.useRedirectsManagerState();
+    const filteredCount = (state.filterBy && state.filterBy !== '') ? `(Current search: ${view.length})` : '';
     return (React.createElement("tr", null,
         React.createElement("th", { colSpan: 5 },
             React.createElement("hr", null),
-            "Viewing ",
-            view.length,
-            " Redirects of ",
-            totalStore,
-            React.createElement(NumberedButtons, { pageNumbers: pageNumbers }))));
+            "Redirects: ",
+            state.store.length,
+            " ",
+            filteredCount,
+            React.createElement(NumberedButtons, { pageNumbers: getPageNumbers(view, state.perPage) }))));
 };
 
 
@@ -87131,7 +87146,7 @@ exports.Toolbar = () => {
             React.createElement("label", { htmlFor: 'e301r-wildcard', style: { marginLeft: '5px' } }, "Use Wildcard?")),
         React.createElement("div", { className: 'alignright actions', style: { display: 'flex' } },
             React.createElement("label", { htmlFor: 'wer-filterby', style: { marginRight: '5px', marginTop: '5px' } }, "Search: "),
-            React.createElement(SearchInput, { onChange: (e) => dispatch({ type: 'set', value: Object.assign(Object.assign({}, state), { filterBy: e.target.value }) }), type: 'text', defaultValue: state.filterBy, id: 'wer-filterby', name: 'wer-filterby' }))));
+            React.createElement(SearchInput, { onChange: (e) => dispatch({ type: 'set', value: Object.assign(Object.assign({}, state), { filterBy: e.target.value, currentPage: 1 }) }), type: 'text', value: state.filterBy, id: 'wer-filterby', name: 'wer-filterby' }))));
 };
 
 
@@ -87184,7 +87199,7 @@ const redirectsManagerReduducer = (state, action) => {
     switch (action.type) {
         case 'add': {
             state.store.push({ id: uuid_1.v4(), modificationDate: 'not saved' });
-            return Object.assign(Object.assign({}, state), { lastModification: new Date });
+            return Object.assign(Object.assign({}, state), { currentPage: 1 });
         }
         case 'edit': {
             const index = state.store.findIndex((el) => {
