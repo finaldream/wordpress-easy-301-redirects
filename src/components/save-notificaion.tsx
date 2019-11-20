@@ -1,8 +1,8 @@
-import * as React from "react";
+import * as React from 'react';
 
-type SaveNotificationProps = {added: number, modified: number, deleted: number}
+interface SaveNotificationProps { added: number; modified: number; deleted: number; }
 
-export const SaveNotification = ({added, modified, deleted} : SaveNotificationProps) => {
+export const SaveNotification = ({added, modified, deleted}: SaveNotificationProps) => {
     return (
         <div>
             Redirects Succesfully saved!<br/>
@@ -10,5 +10,5 @@ export const SaveNotification = ({added, modified, deleted} : SaveNotificationPr
             Modified: {modified}<br/>
             Deleted: {deleted}
         </div>
-    )
-}
+    );
+};

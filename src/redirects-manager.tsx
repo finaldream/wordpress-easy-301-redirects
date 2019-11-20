@@ -3,28 +3,28 @@ import { mountComponent } from 'mount-component';
 import { ToastContainer } from 'react-toastify';
 import 'react-toastify/dist/ReactToastify.min.css';
 
-import { useRedirectsManagerDispatch, 
-         RedirectsManagerProvider, 
+import { useRedirectsManagerDispatch,
+         RedirectsManagerProvider,
          RedirectsManagerContextInterface,
         } from './lib/redirects-manager-context';
 
 import { validateLoad, checkRepeatedRequests } from './lib/utils';
 
-import { ListRedirections } from './components/list-redirections'
+import { ListRedirections } from './components/list-redirections';
 import { Toolbar } from './components/toolbar';
 
-type RedirectsManagerProps  = {
+interface RedirectsManagerProps  {
     initialState: RedirectsManagerContextInterface;
 }
-type RedirectsManagerComponentProps = {
-    initialState: RedirectsManagerContextInterface
+interface RedirectsManagerComponentProps {
+    initialState: RedirectsManagerContextInterface;
 }
 
-const RedirectsManagerComponent = ( { initialState } : RedirectsManagerComponentProps) => {
+const RedirectsManagerComponent = ( { initialState }: RedirectsManagerComponentProps) => {
     const dispatch = useRedirectsManagerDispatch();
-    dispatch({type: 'set', value: initialState})
-    return ( 
-        <table className='widefat' style={{width: '100%'}}>
+    dispatch({type: 'set', value: initialState});
+    return (
+        <table className="widefat" style={{width: '100%'}}>
             <Toolbar />
             <thead>
                 <tr>
@@ -37,29 +37,29 @@ const RedirectsManagerComponent = ( { initialState } : RedirectsManagerComponent
             </thead>
             <ListRedirections />
         </table>
-    )
-}
+    );
+};
 
 export class RedirectsManager extends React.Component<RedirectsManagerProps> {
 
-    public defaultProps : RedirectsManagerProps;
-
-    constructor(props : RedirectsManagerProps) {
-        super(props);
-    }
-        
-    public static defaultProps : RedirectsManagerProps = {
+    public static defaultProps: RedirectsManagerProps = {
         initialState : {wildcard: false, store: [], filterBy: '', saving: false, lastModification: null, lastSave: null}
     };
-    
+
+    public defaultProps: RedirectsManagerProps;
+
+    constructor(props: RedirectsManagerProps) {
+        super(props);
+    }
+
     public render(): JSX.Element {
         const validatedState = validateLoad(this.props.initialState);
-        return (                   
+        return (
         <RedirectsManagerProvider>
             <RedirectsManagerComponent initialState={validatedState} />
-            <ToastContainer position='bottom-right'/>
+            <ToastContainer position="bottom-right"/>
         </RedirectsManagerProvider>
-        )
+        );
     }
 }
 

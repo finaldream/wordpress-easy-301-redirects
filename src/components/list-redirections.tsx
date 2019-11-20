@@ -3,45 +3,45 @@ import { useRedirectsManagerState, RedirectionsStore, RedirectsManagerContextInt
 import { sortByMultipleProperties } from '../lib/utils';
 
 import { Redirection } from './redirection';
-import { Paginator } from  './paginator';
+import { Paginator } from './paginator';
 
-type getView = (state : RedirectsManagerContextInterface, orderby?: string, sort?: 'asc' | 'desc' ) => RedirectionsStore;
+type getView = (state: RedirectsManagerContextInterface, orderby?: string, sort?: 'asc' | 'desc' ) => RedirectionsStore;
 
-const getView : getView = (state, orderby = 'modificationDate', sort = 'asc') => {
-    let view : RedirectionsStore = [...state.store];
+const getView: getView = (state, orderby = 'modificationDate', sort = 'asc') => {
+    let view: RedirectionsStore = [...state.store];
     if (state.filterBy && state.filterBy !== '') {
         view = view.filter((el) => {
             return (
-                (el.request ? el.request.includes(state.filterBy) : true) || 
+                (el.request ? el.request.includes(state.filterBy) : true) ||
                 (el.destination ? el.destination.includes(state.filterBy) : true)
             );
-        })
+        });
     }
     view = view.sort((a, b) => sortByMultipleProperties(a, b, [`-${orderby}`, 'order']));
-    if(sort === 'desc') view.reverse();
+    if (sort === 'desc') { view.reverse(); }
     return view;
-}
+};
 
-type paginateView = (state : RedirectsManagerContextInterface, store: RedirectionsStore) => RedirectionsStore;
+type paginateView = (state: RedirectsManagerContextInterface, store: RedirectionsStore) => RedirectionsStore;
 
-const paginateView : paginateView = (state, store) => {
+const paginateView: paginateView = (state, store) => {
     const perPage = state.perPage ? state.perPage : store.length;
     const currentPage = state.currentPage ? state.currentPage : 1;
-    return store.slice((currentPage-1)*perPage, (currentPage*perPage) );
-}
+    return store.slice((currentPage - 1) * perPage, (currentPage * perPage) );
+};
 
-export const ListRedirections : React.FunctionComponent = () => {
+export const ListRedirections: React.FunctionComponent = () => {
     const state = useRedirectsManagerState();
     const view = getView(state);
     const paginated = paginateView(state, view);
     return (
         <tbody>
             {
-            paginated.map((redirection)=> {
-                return <Redirection key={redirection.id} redirection={redirection} />
+            paginated.map((redirection) => {
+                return <Redirection key={redirection.id} redirection={redirection} />;
             })
             }
             <Paginator view={view} />
-        </tbody>    
-    )
-}
+        </tbody>
+    );
+};
