@@ -4,7 +4,8 @@ import { toast, ToastContent, ToastOptions, TypeOptions, Toast } from 'react-toa
 import { v4 } from 'uuid'
 import { countBy, transform } from 'lodash'
 
-import { RedirectionsStore, RedirectsManagerContextInterface, RedirectionProps } from './redirects-manager-context';
+import { RedirectionsStore, RedirectsManagerContextInterface } from './redirects-manager-context';
+import { SaveNotification } from '../components/save-notificaion';
 
 const ajaxUrl : string = (window as any).ajaxurl;
 
@@ -15,19 +16,25 @@ export const showNotification : showNotification = (type, content, options = {})
     return toast(content, options);
 }
 
-type validatedLoad = (store: RedirectionsStore) => RedirectionsStore
+type validatedLoad = (state: RedirectsManagerContextInterface) => RedirectsManagerContextInterface
 
-export const validateLoad : validatedLoad = (store) => {
+export const validateLoad : validatedLoad = (state) => {
     let valid = true;
-    const validatedLoad: RedirectionsStore = store.map((redirection) => {
+    state.store = state.store.map((redirection) => {
         if (!redirection.id || redirection.id === '') {
             redirection.id = v4();
+            redirection.modificationDate = 'not saved'
             valid = false;
         } 
         return redirection
     })
-    if (!valid) showNotification('info', 'Data imported from old Simple301 plugin. Please review and save your changes to commit. After saving please deactivate the old plugin.');
-    return validatedLoad;
+    state.imported = false;
+    if (!valid) {
+        state.imported = true;
+        showNotification('info', 'Data imported from old Simple301 plugin. Please review and save your changes to commit. After saving please deactivate the old plugin.');
+    }
+    state.perPage = 10;
+    return checkRepeatedRequests(state);
 }
 
 type saveState = (state : RedirectsManagerContextInterface) => Promise<RedirectsManagerContextInterface>
@@ -60,15 +67,15 @@ export const saveState : saveState = async (state) => {
         {
             showNotification('warning', 'No changes were made!');
         } else {
-            showNotification('success', `
-            Redirects Succesfully saved!\n
-            Added: ${json.data.redirects_added}\n
-            Modified: ${json.data.redirects_modified}\n
-            Deleted: ${json.data.redirects_deleted}\n
-            `);
+            const notificationMsg = !state.imported ? SaveNotification({
+                added: json.data.redirects_added,
+                modified: json.data.redirects_modified,
+                deleted: json.data.redirects_deleted
+            }) : 'Success! Your first save is done! Please deactivate Simple 301 Redirects plugin to avoid conflicts';
+            showNotification('success', notificationMsg);
         }
         const final : RedirectsManagerContextInterface = {...state, store: json.data.store};
-        return checkRepeatedRequests(final);
+        return validateLoad(final);
     } else {
         showNotification('error', 'An Error ocurred! Changes not saved');
         throw new Error(result.statusText);

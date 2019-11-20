@@ -11,6 +11,7 @@ export interface RedirectsManagerContextInterface {
     filterBy?: string,
     perPage?: number,
     currentPage?: number,
+    imported?: boolean,
 }
 
 export interface RedirectionProps {

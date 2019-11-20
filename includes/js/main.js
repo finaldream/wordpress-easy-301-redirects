@@ -87099,6 +87099,41 @@ exports.Redirection = ({ redirection }) => {
 
 /***/ }),
 
+/***/ "./src/components/save-notificaion.tsx":
+/*!*********************************************!*\
+  !*** ./src/components/save-notificaion.tsx ***!
+  \*********************************************/
+/*! no static exports found */
+/***/ (function(module, exports, __webpack_require__) {
+
+"use strict";
+
+var __importStar = (this && this.__importStar) || function (mod) {
+    if (mod && mod.__esModule) return mod;
+    var result = {};
+    if (mod != null) for (var k in mod) if (Object.hasOwnProperty.call(mod, k)) result[k] = mod[k];
+    result["default"] = mod;
+    return result;
+};
+Object.defineProperty(exports, "__esModule", { value: true });
+const React = __importStar(__webpack_require__(/*! react */ "./node_modules/react/index.js"));
+exports.SaveNotification = ({ added, modified, deleted }) => {
+    return (React.createElement("div", null,
+        "Redirects Succesfully saved!",
+        React.createElement("br", null),
+        "Added: ",
+        added,
+        React.createElement("br", null),
+        "Modified: ",
+        modified,
+        React.createElement("br", null),
+        "Deleted: ",
+        deleted));
+};
+
+
+/***/ }),
+
 /***/ "./src/components/toolbar.tsx":
 /*!************************************!*\
   !*** ./src/components/toolbar.tsx ***!
@@ -87268,23 +87303,29 @@ Object.defineProperty(exports, "__esModule", { value: true });
 const react_toastify_1 = __webpack_require__(/*! react-toastify */ "./node_modules/react-toastify/esm/react-toastify.js");
 const uuid_1 = __webpack_require__(/*! uuid */ "./node_modules/uuid/index.js");
 const lodash_1 = __webpack_require__(/*! lodash */ "./node_modules/lodash/lodash.js");
+const save_notificaion_1 = __webpack_require__(/*! ../components/save-notificaion */ "./src/components/save-notificaion.tsx");
 const ajaxUrl = window.ajaxurl;
 exports.showNotification = (type, content, options = {}) => {
     options.type = type;
     return react_toastify_1.toast(content, options);
 };
-exports.validateLoad = (store) => {
+exports.validateLoad = (state) => {
     let valid = true;
-    const validatedLoad = store.map((redirection) => {
+    state.store = state.store.map((redirection) => {
         if (!redirection.id || redirection.id === '') {
             redirection.id = uuid_1.v4();
+            redirection.modificationDate = 'not saved';
             valid = false;
         }
         return redirection;
     });
-    if (!valid)
+    state.imported = false;
+    if (!valid) {
+        state.imported = true;
         exports.showNotification('info', 'Data imported from old Simple301 plugin. Please review and save your changes to commit. After saving please deactivate the old plugin.');
-    return validatedLoad;
+    }
+    state.perPage = 10;
+    return exports.checkRepeatedRequests(state);
 };
 exports.saveState = (state) => __awaiter(void 0, void 0, void 0, function* () {
     const payload = { wildcard: state.wildcard, store: state.store };
@@ -87316,15 +87357,15 @@ exports.saveState = (state) => __awaiter(void 0, void 0, void 0, function* () {
             exports.showNotification('warning', 'No changes were made!');
         }
         else {
-            exports.showNotification('success', `
-            Redirects Succesfully saved!\n
-            Added: ${json.data.redirects_added}\n
-            Modified: ${json.data.redirects_modified}\n
-            Deleted: ${json.data.redirects_deleted}\n
-            `);
+            const notificationMsg = !state.imported ? save_notificaion_1.SaveNotification({
+                added: json.data.redirects_added,
+                modified: json.data.redirects_modified,
+                deleted: json.data.redirects_deleted
+            }) : 'Success! Your first save is done! Please deactivate Simple 301 Redirects plugin to avoid conflicts';
+            exports.showNotification('success', notificationMsg);
         }
         const final = Object.assign(Object.assign({}, state), { store: json.data.store });
-        return exports.checkRepeatedRequests(final);
+        return exports.validateLoad(final);
     }
     else {
         exports.showNotification('error', 'An Error ocurred! Changes not saved');
@@ -87407,9 +87448,9 @@ class RedirectsManager extends React.Component {
         super(props);
     }
     render() {
-        const validatedStote = utils_1.validateLoad(this.props.initialState.store);
+        const validatedState = utils_1.validateLoad(this.props.initialState);
         return (React.createElement(redirects_manager_context_1.RedirectsManagerProvider, null,
-            React.createElement(RedirectsManagerComponent, { initialState: utils_1.checkRepeatedRequests(Object.assign(Object.assign({}, this.props.initialState), { store: validatedStote, perPage: 10 })) }),
+            React.createElement(RedirectsManagerComponent, { initialState: validatedState }),
             React.createElement(react_toastify_1.ToastContainer, { position: 'bottom-right' })));
     }
 }

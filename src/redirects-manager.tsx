@@ -53,10 +53,10 @@ export class RedirectsManager extends React.Component<RedirectsManagerProps> {
     };
     
     public render(): JSX.Element {
-        const validatedStote = validateLoad(this.props.initialState.store);
+        const validatedState = validateLoad(this.props.initialState);
         return (                   
         <RedirectsManagerProvider>
-            <RedirectsManagerComponent initialState={checkRepeatedRequests({...this.props.initialState, store: validatedStote, perPage: 10})} />
+            <RedirectsManagerComponent initialState={validatedState} />
             <ToastContainer position='bottom-right'/>
         </RedirectsManagerProvider>
         )
