@@ -79,7 +79,7 @@ const redirectsManagerReduducer = (state: RedirectsManagerContextInterface, acti
 
         case 'saving-state': {
             state.saving = action.value;
-            return state;
+            return {...state};
         }
 
         default: {

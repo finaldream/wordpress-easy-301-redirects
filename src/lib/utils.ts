@@ -5,7 +5,7 @@ import { v4 } from 'uuid';
 import { countBy, transform } from 'lodash';
 
 import { RedirectionsStore, RedirectsManagerContextInterface } from './redirects-manager-context';
-import { SaveNotification } from '../components/save-notificaion';
+import { SaveNotification } from '../components/save-notification';
 
 const ajaxUrl: string = (window as any).ajaxurl;
 
@@ -60,7 +60,8 @@ export const saveState: saveState = async (state) => {
             redirects_added: number,
             redirects_modified: number,
             redirects_deleted: number,
-            store: RedirectionsStore
+            store: RedirectionsStore,
+            wildcard: boolean
         }};
         try {
             json = await result.json();
@@ -71,12 +72,13 @@ export const saveState: saveState = async (state) => {
         if (json.data.redirects_added === 0 &&
             json.data.redirects_modified === 0 &&
             json.data.redirects_deleted === 0) {
-            showNotification('warning', 'No changes were made!');
+            showNotification('success', `No changes to redirections. Wildcars is ${json.data.wildcard ? 'active' :  'inactive'}` );
         } else {
             const notificationMsg = !state.imported ? SaveNotification({
                 added: json.data.redirects_added,
                 modified: json.data.redirects_modified,
-                deleted: json.data.redirects_deleted
+                deleted: json.data.redirects_deleted,
+                wildcard: json.data.wildcard
             }) : 'Success! Your first save is done! Please deactivate Simple 301 Redirects plugin to avoid conflicts';
             showNotification('success', notificationMsg);
         }

@@ -1,6 +1,7 @@
 import * as React from 'react';
 
 import { useRedirectsManagerState, useRedirectsManagerDispatch, updateServerState } from '../lib/redirects-manager-context';
+import { stat } from 'fs';
 
 const AddNew = () => {
     const dispatch = useRedirectsManagerDispatch();
@@ -14,9 +15,11 @@ const AddNew = () => {
 const Save = () => {
     const dispatch = useRedirectsManagerDispatch();
     const state = useRedirectsManagerState();
+    const txt = state.saving ? 'Saving...' : 'Save Redirections';
     return (
-    <a className="button" onClick={(e) => updateServerState({dispatch, state})}  style={{marginLeft: '5px'}}>
-      Save Redirections
+    <a className="button" onClick={ !state.saving ? () =>  updateServerState({dispatch, state}) : event.preventDefault}
+        style={{marginLeft: '5px'}}>
+      { txt }
     </a>
     );
 };
