@@ -21,7 +21,7 @@ const Save = () => {
     const dispatch = useRedirectsManagerDispatch();
     const state = useRedirectsManagerState();
     return (
-    <a className="button" onClick={(e) => updateServerState({dispatch, state})} >
+    <a className="button" onClick={(e) => updateServerState({dispatch, state})}  style={{marginLeft: '5px'}}>
       Save Redirections
     </a>
     )
@@ -32,15 +32,16 @@ export const Toolbar : React.FunctionComponent = () => {
     const dispatch = useRedirectsManagerDispatch();
     return (
         <div className='wer-toolbar'>
-            <div className='alignleft actions'>
+            <div className='alignleft actions' style={{display: 'flex'}}>
             <AddNew />
             <Save />
             <input type='checkbox' 
+                style={{marginTop: '5px'}}
                 name='e301r-wildcard'
                 checked={state.wildcard}
                 onChange={() => dispatch({type: 'set', value: {...state, wildcard: !state.wildcard}})}
             />
-            <label htmlFor='e301r-wildcard' style={{marginLeft: '5px'}}>Use Wildcard?</label>
+            <label htmlFor='e301r-wildcard' style={{marginLeft: '5px', marginTop: '5px'}}>Use Wildcard?</label>
             </div>
             <div className='alignright actions' style={{display: 'flex'}}>
                 <label htmlFor='wer-filterby' style={{marginRight: '5px', marginTop: '5px'}}>Search: </label>

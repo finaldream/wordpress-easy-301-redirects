@@ -23,9 +23,9 @@ const validateSelectedPage : validateSelectedPage = (input, max) => {
     return page;
 }
 
-type NumberedButtonsProps = { pageNumbers : Array<number>};
+type PageSelectorProps = { pageNumbers : Array<number>};
 
-const NumberedButtons = ( { pageNumbers } : NumberedButtonsProps) => {
+const PageSelector = ( { pageNumbers } : PageSelectorProps) => {
     const state = useRedirectsManagerState();
     const dispatch = useRedirectsManagerDispatch();
     const currentPage = state.currentPage ? state.currentPage : 1;
@@ -56,7 +56,7 @@ export const Paginator = ({ view } : PaginatorComponentProps) => {
             <th colSpan={5}>
                 <hr/>
                 Redirects: {state.store.length} { filteredCount }
-                <NumberedButtons pageNumbers={getPageNumbers(view, state.perPage)} />
+                <PageSelector pageNumbers={getPageNumbers(view, state.perPage)} />
             </th>
         </tr>
     )

@@ -87025,7 +87025,7 @@ const validateSelectedPage = (input, max) => {
         return max;
     return page;
 };
-const NumberedButtons = ({ pageNumbers }) => {
+const PageSelector = ({ pageNumbers }) => {
     const state = redirects_manager_context_1.useRedirectsManagerState();
     const dispatch = redirects_manager_context_1.useRedirectsManagerDispatch();
     const currentPage = state.currentPage ? state.currentPage : 1;
@@ -87047,7 +87047,7 @@ exports.Paginator = ({ view }) => {
             state.store.length,
             " ",
             filteredCount,
-            React.createElement(NumberedButtons, { pageNumbers: getPageNumbers(view, state.perPage) }))));
+            React.createElement(PageSelector, { pageNumbers: getPageNumbers(view, state.perPage) }))));
 };
 
 
@@ -87133,17 +87133,17 @@ const AddNew = () => {
 const Save = () => {
     const dispatch = redirects_manager_context_1.useRedirectsManagerDispatch();
     const state = redirects_manager_context_1.useRedirectsManagerState();
-    return (React.createElement("a", { className: "button", onClick: (e) => redirects_manager_context_1.updateServerState({ dispatch, state }) }, "Save Redirections"));
+    return (React.createElement("a", { className: "button", onClick: (e) => redirects_manager_context_1.updateServerState({ dispatch, state }), style: { marginLeft: '5px' } }, "Save Redirections"));
 };
 exports.Toolbar = () => {
     const state = redirects_manager_context_1.useRedirectsManagerState();
     const dispatch = redirects_manager_context_1.useRedirectsManagerDispatch();
     return (React.createElement("div", { className: 'wer-toolbar' },
-        React.createElement("div", { className: 'alignleft actions' },
+        React.createElement("div", { className: 'alignleft actions', style: { display: 'flex' } },
             React.createElement(AddNew, null),
             React.createElement(Save, null),
-            React.createElement("input", { type: 'checkbox', name: 'e301r-wildcard', checked: state.wildcard, onChange: () => dispatch({ type: 'set', value: Object.assign(Object.assign({}, state), { wildcard: !state.wildcard }) }) }),
-            React.createElement("label", { htmlFor: 'e301r-wildcard', style: { marginLeft: '5px' } }, "Use Wildcard?")),
+            React.createElement("input", { type: 'checkbox', style: { marginTop: '5px' }, name: 'e301r-wildcard', checked: state.wildcard, onChange: () => dispatch({ type: 'set', value: Object.assign(Object.assign({}, state), { wildcard: !state.wildcard }) }) }),
+            React.createElement("label", { htmlFor: 'e301r-wildcard', style: { marginLeft: '5px', marginTop: '5px' } }, "Use Wildcard?")),
         React.createElement("div", { className: 'alignright actions', style: { display: 'flex' } },
             React.createElement("label", { htmlFor: 'wer-filterby', style: { marginRight: '5px', marginTop: '5px' } }, "Search: "),
             React.createElement(SearchInput, { onChange: (e) => dispatch({ type: 'set', value: Object.assign(Object.assign({}, state), { filterBy: e.target.value, currentPage: 1 }) }), type: 'text', value: state.filterBy, id: 'wer-filterby', name: 'wer-filterby' }))));
@@ -87396,17 +87396,18 @@ const toolbar_1 = __webpack_require__(/*! ./components/toolbar */ "./src/compone
 const RedirectsManagerComponent = ({ initialState }) => {
     const dispatch = redirects_manager_context_1.useRedirectsManagerDispatch();
     dispatch({ type: 'set', value: initialState });
-    return (React.createElement("table", { className: 'widefat' },
+    return (React.createElement("table", { className: 'widefat', style: { width: '100%' } },
         React.createElement("thead", null,
             React.createElement("tr", null,
                 React.createElement("th", { colSpan: 5 },
                     React.createElement(toolbar_1.Toolbar, null)))),
         React.createElement("thead", null,
             React.createElement("tr", null,
-                React.createElement("th", { colSpan: 2 }, "Request"),
-                React.createElement("th", null, "Destination"),
-                React.createElement("th", null, "Last Modification"),
-                React.createElement("th", null, "Action"))),
+                React.createElement("th", { style: { width: '41%' } }, "Request"),
+                React.createElement("th", { style: { width: '2%' } }),
+                React.createElement("th", { style: { width: '41%' } }, "Destination"),
+                React.createElement("th", { style: { width: '11%' } }, "Last Modification"),
+                React.createElement("th", { style: { width: '5%', textAlign: 'center' } }, "Action"))),
         React.createElement(list_redirections_1.ListRedirections, null),
         React.createElement("tfoot", null,
             React.createElement("tr", null,
