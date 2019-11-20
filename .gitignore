@@ -60,7 +60,3 @@ typings/
 
 # next.js build output
 .next
-
-# not track js files, coming from build process
-includes/js/main.js
-includes/js/main.js.map
