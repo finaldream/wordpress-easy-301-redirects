@@ -1,8 +1,12 @@
 {
     "name": "finaldream/wordpress-easy-301-redirects",
-    "description": "Modern and Easy 301 redirects for Wordpress",
+    "description": "Modern and Easy 301 redirects for Wordpress. Intend to replace Simple 301 Redirects",
     "type": "wordpress-plugin",
     "license": "MIT",
+    "version": "1.0.0",
+    "keywords": ["redirection", "301"],
+    "readme": "/README.md",
+    "homepage": "https://github.com/finaldream/wordpress-easy-301-redirects",
     "authors": [
       {
         "name": "Oliver Erdmann",
@@ -13,6 +17,18 @@
         "email": "carlos@gonzalezri.co"
       }
     ],
+    "archive": {
+      "exclude": [
+        "/src",
+        "/.gitignore",
+        "/node_modules",
+        "/package.json",
+        "/tsconfig.json",
+        "/tslint.json",
+        "/webpack.config.js",
+        "/yarn.lock"
+      ]
+    },
     "autoload": {
       "psr-4": {
         "": ""
