@@ -53,25 +53,33 @@ export const redirectsManagerReducer: RedirectsManagerReducerType = (state, acti
     switch (action.type) {
 
         case 'add': {
-            state.store.push({id: v4(), modificationDate: 'not saved'});
-            return {...state, currentPage: 1};
+            const newState = {...state};
+            newState.store.push({id: v4(), modificationDate: 'not saved'});
+            newState.currentPage = 1;
+            return newState;
         }
 
         case 'edit': {
-            const index = state.store.findIndex((el) => {
+            const newState = {...state};
+            const index = newState.store.findIndex((el) => {
                 return el.id === action.value.id;
             });
-            state.store[index] = action.value;
-            state.lastModification = new Date();
-            return {...checkRepeatedRequests(state)};
+            if (index !== -1) {
+                newState.store[index] = action.value;
+            }
+            newState.lastModification = new Date();
+            const validatedState = checkRepeatedRequests(newState);
+            return validatedState;
         }
 
         case 'remove': {
-            state.store = state.store.filter((el) => {
+            const newState = {...state};
+            newState.store = newState.store.filter((el) => {
                 return el.id !== action.value.id;
             });
-            state.lastModification = new Date();
-            return {...checkRepeatedRequests(state)};
+            newState.lastModification = new Date();
+            const validatedState = checkRepeatedRequests(newState);
+            return validatedState;
         }
 
         case 'set': {
@@ -79,8 +87,9 @@ export const redirectsManagerReducer: RedirectsManagerReducerType = (state, acti
         }
 
         case 'saving-state': {
-            state.saving = action.value;
-            return {...state};
+            const newState = {...state};
+            newState.saving = action.value;
+            return newState;
         }
 
         case 'toggle-wildcard': {
