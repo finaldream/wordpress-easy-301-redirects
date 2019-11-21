@@ -1,7 +1,7 @@
 import * as React from 'react';
 import styled from 'styled-components';
 
-import { useRedirectsManagerDispatch, RedirectionProps } from '../lib/redirects-manager-context';
+import { RedirectionProps, Dispatch } from '../lib/redirects-manager-state';
 
 interface InputProps {
     readonly warning?: boolean;
@@ -15,10 +15,10 @@ const Input = styled.input<InputProps>`
 
 interface RedirectionComponentProps {
     redirection: RedirectionProps;
+    dispatch: Dispatch;
 }
 
-export const Redirection = ( {redirection}: RedirectionComponentProps ) => {
-    const dispatch = useRedirectsManagerDispatch();
+export const Redirection = ( {redirection, dispatch}: RedirectionComponentProps ) => {
     const handleEdition = (e: React.ChangeEvent<HTMLInputElement>) => dispatch(
         {
             type: 'edit',

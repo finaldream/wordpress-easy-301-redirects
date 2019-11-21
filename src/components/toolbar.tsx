@@ -1,44 +1,54 @@
 import * as React from 'react';
 
-import { useRedirectsManagerState, useRedirectsManagerDispatch, updateServerState } from '../lib/redirects-manager-context';
+import { updateServerState, RedirectsManagerStateInterface, Dispatch } from '../lib/redirects-manager-state';
 
-const AddNew = () => {
-    const dispatch = useRedirectsManagerDispatch();
+interface ButtonsProps extends React.DOMAttributes<HTMLAnchorElement> {
+    toggle?: boolean;
+    onClick?: (event: React.MouseEvent<HTMLAnchorElement, MouseEvent>) => void;
+}
+
+const AddNew = ({onClick}: ButtonsProps) => {
     return (
-    <a className="button" onClick={(e) => dispatch({type: 'add', value: null})} >
+    <a className="button" onClick={onClick} >
       Add new Redirection
     </a>
     );
 };
 
-const Save = () => {
-    const dispatch = useRedirectsManagerDispatch();
-    const state = useRedirectsManagerState();
-    const txt = state.saving ? 'Saving...' : 'Save Redirections';
+const Save = ({toggle, onClick}: ButtonsProps) => {
+    const txt = toggle ? 'Saving...' : 'Save Redirections';
     return (
-    <a className="button" onClick={ !state.saving ? () =>  updateServerState({dispatch, state}) : event.preventDefault}
-        style={{marginLeft: '5px'}}>
+    <a className="button"
+        onClick={onClick}
+        style={{marginLeft: '5px', cursor: toggle ? 'wait' : 'pointer'}}
+        >
       { txt }
     </a>
     );
 };
 
-export const Toolbar: React.FunctionComponent = () => {
-    const state = useRedirectsManagerState();
-    const dispatch = useRedirectsManagerDispatch();
+interface ToolbatProps  {
+    state: RedirectsManagerStateInterface;
+    dispatch: Dispatch;
+}
+
+export const Toolbar = ({state, dispatch}: ToolbatProps) => {
     return (
         <thead>
             <tr>
                 <th colSpan={5}>
                     <div className="wer-toolbar">
                         <div className="alignleft actions" style={{display: 'flex'}}>
-                        <AddNew />
-                        <Save />
+                        <AddNew onClick={(e) => dispatch({type: 'add', value: null})} />
+                        <Save onClick={
+                            !state.saving ? () => updateServerState({dispatch, state})
+                            : event.preventDefault}
+                            toggle={state.saving}/>
                         <input type="checkbox"
                             style={{marginTop: '5px'}}
                             name="e301r-wildcard"
                             checked={state.wildcard}
-                            onChange={() => dispatch({type: 'set', value: {...state, wildcard: !state.wildcard}})}
+                            onChange={() => dispatch({type: 'toggle-wildcard' , value: !state.wildcard })}
                         />
                         <label htmlFor="e301r-wildcard" style={{marginLeft: '5px', marginTop: '5px'}}>
                             Use Wildcard?
@@ -51,8 +61,8 @@ export const Toolbar: React.FunctionComponent = () => {
                             <input
                                 onChange={(e) => dispatch(
                                     {
-                                        type: 'set',
-                                        value: {...state, filterBy: e.target.value, currentPage: 1}
+                                        type: 'set-filter',
+                                        value: e.target.value
                                     }
                                 )}
                                 type="text"

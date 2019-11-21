@@ -4,7 +4,7 @@ import { toast, ToastContent, ToastOptions, TypeOptions, Toast } from 'react-toa
 import { v4 } from 'uuid';
 import { countBy, transform } from 'lodash';
 
-import { RedirectionsStore, RedirectsManagerContextInterface } from './redirects-manager-context';
+import { RedirectionsStore, RedirectsManagerStateInterface, RedirectionProps } from './redirects-manager-state';
 import { SaveNotification } from '../components/save-notification';
 
 const ajaxUrl: string = (window as any).ajaxurl;
@@ -16,7 +16,7 @@ export const showNotification: showNotificationType = (type, content, options = 
     return toast(content, options);
 };
 
-type validatedLoadType = (state: RedirectsManagerContextInterface) => RedirectsManagerContextInterface;
+type validatedLoadType = (state: RedirectsManagerStateInterface) => RedirectsManagerStateInterface;
 
 export const validateLoad: validatedLoadType = (state) => {
     let valid = true;
@@ -37,7 +37,7 @@ export const validateLoad: validatedLoadType = (state) => {
     return checkRepeatedRequests(state);
 };
 
-type saveStateType = (state: RedirectsManagerContextInterface) => Promise<RedirectsManagerContextInterface>;
+type saveStateType = (state: RedirectsManagerStateInterface) => Promise<RedirectsManagerStateInterface>;
 
 export const saveState: saveStateType = async (state) => {
     const payload = {wildcard: state.wildcard, store: state.store};
@@ -82,7 +82,7 @@ export const saveState: saveStateType = async (state) => {
             }) : 'Success! Your first save is done! Please deactivate Simple 301 Redirects plugin to avoid conflicts';
             showNotification('success', notificationMsg);
         }
-        const final: RedirectsManagerContextInterface = {...state, store: json.data.store};
+        const final: RedirectsManagerStateInterface = {...state, store: json.data.store};
         return validateLoad(final);
     } else {
         showNotification('error', 'An Error ocurred! Changes not saved');
@@ -115,7 +115,7 @@ export const sortByMultipleProperties: sortByMultiplePropertiesType = (a, b, pro
     return result;
 };
 
-type checkRepeatedRequestsType = ( state: RedirectsManagerContextInterface) => RedirectsManagerContextInterface;
+type checkRepeatedRequestsType = ( state: RedirectsManagerStateInterface) => RedirectsManagerStateInterface;
 
 export const checkRepeatedRequests: checkRepeatedRequestsType = (state) => {
     const repeatedRequest: string[] = transform( countBy(state.store, (el) => el.request), (result, count, value) => {

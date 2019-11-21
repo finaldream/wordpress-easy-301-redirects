@@ -1,8 +1,7 @@
-import * as React from 'react';
 import { v4 } from 'uuid';
 import { saveState, checkRepeatedRequests } from './utils';
 
-export interface RedirectsManagerContextInterface {
+export interface RedirectsManagerStateInterface {
     store: RedirectionsStore;
     wildcard: boolean;
     saving?: boolean;
@@ -24,15 +23,13 @@ export interface RedirectionProps {
 
 export interface RedirectionsStore extends Array<RedirectionProps> { }
 
-type Dispatch = (action: Action) => void;
-interface RedirectsManagerProviderProps { children: React.ReactNode; }
+export type Dispatch = (action: Action) => void;
 
-const RedirectsManagerContext = React.createContext<RedirectsManagerContextInterface | undefined>(undefined);
-const RedirectsManagerDispatchContext = React.createContext<Dispatch | undefined>(undefined);
+interface UpdateServerStateProps {dispatch: Dispatch; state: RedirectsManagerStateInterface; }
 
-interface UpdateServerStateProps {dispatch: Dispatch; state: RedirectsManagerContextInterface; }
+export type UpdateServerStateType = CallableFunction;
 
-export const updateServerState = async ({dispatch, state}: UpdateServerStateProps) => {
+export const updateServerState: UpdateServerStateType = async ({dispatch, state}: UpdateServerStateProps) => {
     dispatch({type: 'saving-state', value: true});
     try {
         const newState = await saveState(state);
@@ -40,19 +37,23 @@ export const updateServerState = async ({dispatch, state}: UpdateServerStateProp
     } catch (e) {
         dispatch({type: 'saving-state', value: false});
     }
+    return;
 };
 
 type Action = {type: 'saving-state', value: boolean} |
               {type: 'add', value: null} |
               {type: 'remove', value: RedirectionProps} |
               {type: 'edit', value: RedirectionProps} |
-              {type: 'set', value: RedirectsManagerContextInterface};
+              {type: 'toggle-wildcard', value: boolean} |
+              {type: 'set-filter', value: string} |
+              {type: 'set-current-page', value: number} |
+              {type: 'set', value: RedirectsManagerStateInterface};
 
 type RedirectsManagerReducerType = (
-    state: RedirectsManagerContextInterface,
-    action: Action) => RedirectsManagerContextInterface;
+    state: RedirectsManagerStateInterface,
+    action: Action) => RedirectsManagerStateInterface;
 
-const redirectsManagerReduducer: RedirectsManagerReducerType = (state, action) => {
+export const redirectsManagerReducer: RedirectsManagerReducerType = (state, action) => {
     switch (action.type) {
 
         case 'add': {
@@ -86,35 +87,24 @@ const redirectsManagerReduducer: RedirectsManagerReducerType = (state, action) =
             return {...state};
         }
 
+        case 'toggle-wildcard': {
+            const newState = {...state};
+            newState.wildcard = action.value;
+            return newState;
+        }
+        case 'set-filter': {
+            const newState = {...state};
+            newState.filterBy = action.value;
+            return newState;
+        }
+        case 'set-current-page': {
+            const newState = {...state};
+            newState.currentPage = action.value;
+            return newState;
+        }
+
         default: {
             throw new Error(`Unhandled action type`);
         }
     }
-};
-
-export const RedirectsManagerProvider = ({children}: RedirectsManagerProviderProps) => {
-    const [state, dispatch] = React.useReducer(redirectsManagerReduducer, {store: [], wildcard: false} );
-    return (
-        <RedirectsManagerContext.Provider value={state}>
-            <RedirectsManagerDispatchContext.Provider value={dispatch}>
-                {children}
-            </RedirectsManagerDispatchContext.Provider>
-        </RedirectsManagerContext.Provider>
-    );
-};
-
-export const useRedirectsManagerState = () => {
-    const context = React.useContext(RedirectsManagerContext);
-    if (context === undefined) {
-        throw new Error('useRedirectsManagerState must be used within a RedirectsManagerProvider');
-    }
-    return context;
-};
-
-export const useRedirectsManagerDispatch = () => {
-    const context = React.useContext(RedirectsManagerDispatchContext);
-    if (context === undefined) {
-        throw new Error('useRedirectsManagerDispatch must be used within a RedirectsManagerProvider');
-    }
-    return context;
 };

@@ -43,7 +43,7 @@ module.exports = {
     },
 
     optimization: {
-        minimize: true,
+        minimize: (!process.env.NODE_ENV || process.env.NODE_ENV === "development") ? false : true,
         minimizer: [
             new TerserPlugin({
                 include: /\.js$/,
