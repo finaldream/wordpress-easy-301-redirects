@@ -1,18 +1,29 @@
 import * as React from 'react';
-import { RedirectionsStore, Dispatch } from '../lib/redirects-manager-state';
+import { RedirectionProps, Dispatch } from '../lib/redirects-manager-state';
 import { sortByMultipleProperties } from '../lib/utils';
 
 import { Redirection } from './redirection';
 import { Paginator } from './paginator';
 
 type getViewType = (
-    store: RedirectionsStore,
+    store: RedirectionProps[],
     filterBy: string,
     orderby?: string,
-    sort?: 'asc' | 'desc' ) => RedirectionsStore;
+    sort?: 'asc' | 'desc'
+    ) => RedirectionProps[];
+
+interface ListRedirectionsProps {
+        store: RedirectionProps[];
+        filterBy: string;
+        perPage: number;
+        currentPage: number;
+        dispatch: Dispatch;
+    }
+
+type paginateViewType = (store: RedirectionProps[],  perPage: number, currentPage: number) => RedirectionProps[];
 
 const getView: getViewType = (store, filterBy, orderby = 'modificationDate', sort = 'asc') => {
-    let view: RedirectionsStore = [...store];
+    let view: RedirectionProps[] = [...store];
     if (filterBy && filterBy !== '') {
         view = view.filter((el) => {
             return (
@@ -26,21 +37,11 @@ const getView: getViewType = (store, filterBy, orderby = 'modificationDate', sor
     return view;
 };
 
-type paginateViewType = (store: RedirectionsStore,  perPage: number, currentPage: number) => RedirectionsStore;
-
 const paginateView: paginateViewType = (store, perPage, currentPage) => {
     const countPerPage = perPage ? perPage : store.length;
     const page = currentPage ? currentPage : 1;
     return store.slice((page - 1) * countPerPage, (page * countPerPage) );
 };
-
-interface ListRedirectionsProps {
-    store: RedirectionsStore;
-    filterBy: string;
-    perPage: number;
-    currentPage: number;
-    dispatch: Dispatch;
-}
 
 export const ListRedirections: React.FunctionComponent<ListRedirectionsProps> = (
     {store, filterBy, perPage, currentPage, dispatch}: ListRedirectionsProps) => {
@@ -63,3 +64,4 @@ export const ListRedirections: React.FunctionComponent<ListRedirectionsProps> = 
         </tbody>
     );
 };
+ListRedirections.displayName = 'ListRedirections';

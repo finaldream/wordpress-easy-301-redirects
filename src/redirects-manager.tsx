@@ -3,10 +3,7 @@ import { mountComponent } from 'mount-component';
 import { ToastContainer } from 'react-toastify';
 import 'react-toastify/dist/ReactToastify.min.css';
 
-import {
-         RedirectsManagerStateInterface,
-         redirectsManagerReducer,
-        } from './lib/redirects-manager-state';
+import { RedirectsManagerStateInterface, redirectsManagerReducer, } from './lib/redirects-manager-state';
 
 import { validateLoad } from './lib/utils';
 

@@ -7,6 +7,11 @@ interface ButtonsProps extends React.DOMAttributes<HTMLAnchorElement> {
     onClick?: (event: React.MouseEvent<HTMLAnchorElement, MouseEvent>) => void;
 }
 
+interface ToolbatProps  {
+    state: RedirectsManagerStateInterface;
+    dispatch: Dispatch;
+}
+
 const AddNew = ({onClick}: ButtonsProps) => {
     return (
     <a className="button" onClick={onClick} >
@@ -26,11 +31,6 @@ const Save = ({toggle, onClick}: ButtonsProps) => {
     </a>
     );
 };
-
-interface ToolbatProps  {
-    state: RedirectsManagerStateInterface;
-    dispatch: Dispatch;
-}
 
 export const Toolbar = ({state, dispatch}: ToolbatProps) => {
     return (
@@ -78,3 +78,4 @@ export const Toolbar = ({state, dispatch}: ToolbatProps) => {
     );
 
 };
+Toolbar.displayName = 'Toolbar';

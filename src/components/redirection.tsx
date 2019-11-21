@@ -6,17 +6,17 @@ import { RedirectionProps, Dispatch } from '../lib/redirects-manager-state';
 interface InputProps {
     readonly warning?: boolean;
 }
+interface RedirectionComponentProps {
+    redirection: RedirectionProps;
+    dispatch: Dispatch;
+}
+
 const Input = styled.input<InputProps>`
   padding: 2px;
   font-size: 0.9em;
   width: 100%;
   border: ${(props) => props.warning ? '2px solid red !important' : '1px solid #ddd !important'};
 `;
-
-interface RedirectionComponentProps {
-    redirection: RedirectionProps;
-    dispatch: Dispatch;
-}
 
 export const Redirection = ( {redirection, dispatch}: RedirectionComponentProps ) => {
     const handleEdition = (e: React.ChangeEvent<HTMLInputElement>) => dispatch(
@@ -54,3 +54,4 @@ export const Redirection = ( {redirection, dispatch}: RedirectionComponentProps 
         </tr>
     );
 };
+Redirection.displayName = 'Redirection';

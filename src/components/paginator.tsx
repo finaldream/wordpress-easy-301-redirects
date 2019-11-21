@@ -4,6 +4,19 @@ import { Dispatch } from '../lib/redirects-manager-state';
 
 type getPageNumbersType = (viewLength: number, perPage: number) => number[];
 
+type validateSelectedPageType = (input: string, max: number) => number;
+
+interface PaginatorComponentProps {
+    viewLength: number;
+    filterBy: string;
+    storeLength: number;
+    perPage: number;
+    currentPage: number;
+    dispatch: Dispatch;
+}
+
+interface PageSelectorProps { pageNumbers: number[]; current: number; dispatch: Dispatch; }
+
 const getPageNumbers: getPageNumbersType = (viewLength, perPage) => {
     const pageNumbers = [];
     const calculatedPerPage = perPage ? perPage : viewLength;
@@ -13,16 +26,12 @@ const getPageNumbers: getPageNumbersType = (viewLength, perPage) => {
     return pageNumbers;
 };
 
-type validateSelectedPageType = (input: string, max: number) => number;
-
 const validateSelectedPage: validateSelectedPageType = (input, max) => {
     const page = Number(input);
     if (page < 1) { return 1; }
     if (page > max) { return max; }
     return page;
 };
-
-interface PageSelectorProps { pageNumbers: number[]; current: number; dispatch: Dispatch; }
 
 const PageSelector = ( { pageNumbers, current, dispatch }: PageSelectorProps) => {
     const currentPage = current ? current : 1;
@@ -43,15 +52,6 @@ const PageSelector = ( { pageNumbers, current, dispatch }: PageSelectorProps) =>
         </div>
     );
 };
-
-interface PaginatorComponentProps {
-    viewLength: number;
-    filterBy: string;
-    storeLength: number;
-    perPage: number;
-    currentPage: number;
-    dispatch: Dispatch;
-}
 
 export const Paginator = ({
     viewLength,

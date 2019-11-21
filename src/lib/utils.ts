@@ -4,19 +4,27 @@ import { toast, ToastContent, ToastOptions, TypeOptions, Toast } from 'react-toa
 import { v4 } from 'uuid';
 import { countBy, transform } from 'lodash';
 
-import { RedirectionsStore, RedirectsManagerStateInterface, RedirectionProps } from './redirects-manager-state';
+import { RedirectsManagerStateInterface, RedirectionProps } from './redirects-manager-state';
 import { SaveNotification } from '../components/save-notification';
 
 const ajaxUrl: string = (window as any).ajaxurl;
 
 type showNotificationType = (type: TypeOptions, content: ToastContent, options?: ToastOptions ) => React.ReactText;
 
+type saveStateType = (state: RedirectsManagerStateInterface) => Promise<RedirectsManagerStateInterface>;
+
+type validatedLoadType = (state: RedirectsManagerStateInterface) => RedirectsManagerStateInterface;
+
+type sortByPropertyType = ({}, {}, property: string ) => number;
+
+type sortByMultiplePropertiesType = ({}, {}, properties: string[] ) => number;
+
+type checkRepeatedRequestsType = ( state: RedirectsManagerStateInterface) => RedirectsManagerStateInterface;
+
 export const showNotification: showNotificationType = (type, content, options = {}) => {
     options.type = type;
     return toast(content, options);
 };
-
-type validatedLoadType = (state: RedirectsManagerStateInterface) => RedirectsManagerStateInterface;
 
 export const validateLoad: validatedLoadType = (state) => {
     let valid = true;
@@ -36,8 +44,6 @@ export const validateLoad: validatedLoadType = (state) => {
     state.perPage = 10;
     return checkRepeatedRequests(state);
 };
-
-type saveStateType = (state: RedirectsManagerStateInterface) => Promise<RedirectsManagerStateInterface>;
 
 export const saveState: saveStateType = async (state) => {
     const payload = {wildcard: state.wildcard, store: state.store};
@@ -60,7 +66,7 @@ export const saveState: saveStateType = async (state) => {
             redirects_added: number,
             redirects_modified: number,
             redirects_deleted: number,
-            store: RedirectionsStore,
+            store: RedirectionProps[],
             wildcard: boolean
         }};
         try {
@@ -90,8 +96,6 @@ export const saveState: saveStateType = async (state) => {
     }
 };
 
-type sortByPropertyType = ({}, {}, property: string ) => number;
-
 export const sortByProperty: sortByPropertyType = (a, b, property) => {
     let sortOrder: -1|1 = 1;
     if (property[0] === '-') {
@@ -101,8 +105,6 @@ export const sortByProperty: sortByPropertyType = (a, b, property) => {
     if (!a[property] || !b[property] ) { return 0; }
     return ( (a[property] < b[property]) ? -1 : (a[property] > b[property]) ? 1 : 0 ) * sortOrder;
 };
-
-type sortByMultiplePropertiesType = ({}, {}, properties: string[] ) => number;
 
 export const sortByMultipleProperties: sortByMultiplePropertiesType = (a, b, properties) => {
     let i = 0;
@@ -114,8 +116,6 @@ export const sortByMultipleProperties: sortByMultiplePropertiesType = (a, b, pro
     }
     return result;
 };
-
-type checkRepeatedRequestsType = ( state: RedirectsManagerStateInterface) => RedirectsManagerStateInterface;
 
 export const checkRepeatedRequests: checkRepeatedRequestsType = (state) => {
     const repeatedRequest: string[] = transform( countBy(state.store, (el) => el.request), (result, count, value) => {

@@ -2,7 +2,7 @@ import { v4 } from 'uuid';
 import { saveState, checkRepeatedRequests } from './utils';
 
 export interface RedirectsManagerStateInterface {
-    store: RedirectionsStore;
+    store: RedirectionProps[];
     wildcard: boolean;
     saving?: boolean;
     lastSave?: Date;
@@ -21,24 +21,9 @@ export interface RedirectionProps {
     warningRequestDuplication?: boolean;
 }
 
-export interface RedirectionsStore extends Array<RedirectionProps> { }
-
 export type Dispatch = (action: Action) => void;
 
 interface UpdateServerStateProps {dispatch: Dispatch; state: RedirectsManagerStateInterface; }
-
-export type UpdateServerStateType = CallableFunction;
-
-export const updateServerState: UpdateServerStateType = async ({dispatch, state}: UpdateServerStateProps) => {
-    dispatch({type: 'saving-state', value: true});
-    try {
-        const newState = await saveState(state);
-        dispatch({type: 'set', value: {...newState, lastSave: new Date(), saving: false}});
-    } catch (e) {
-        dispatch({type: 'saving-state', value: false});
-    }
-    return;
-};
 
 type Action = {type: 'saving-state', value: boolean} |
               {type: 'add', value: null} |
@@ -52,6 +37,17 @@ type Action = {type: 'saving-state', value: boolean} |
 type RedirectsManagerReducerType = (
     state: RedirectsManagerStateInterface,
     action: Action) => RedirectsManagerStateInterface;
+
+export const updateServerState = async ({dispatch, state}: UpdateServerStateProps) => {
+    dispatch({type: 'saving-state', value: true});
+    try {
+        const newState = await saveState(state);
+        dispatch({type: 'set', value: {...newState, lastSave: new Date(), saving: false}});
+    } catch (e) {
+        dispatch({type: 'saving-state', value: false});
+    }
+    return;
+};
 
 export const redirectsManagerReducer: RedirectsManagerReducerType = (state, action) => {
     switch (action.type) {
