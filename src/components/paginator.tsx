@@ -2,9 +2,9 @@ import * as React from 'react';
 
 import { useRedirectsManagerState, useRedirectsManagerDispatch, RedirectionsStore } from '../lib/redirects-manager-context';
 
-type getPageNumbers = (view: RedirectionsStore, perPage: number) => number[];
+type getPageNumbersType = (view: RedirectionsStore, perPage: number) => number[];
 
-const getPageNumbers: getPageNumbers = (view, perPage) => {
+const getPageNumbers: getPageNumbersType = (view, perPage) => {
     const pageNumbers = [];
     const totalRedirections = view.length;
     const calculatedPerPage = perPage ? perPage : totalRedirections;
@@ -14,9 +14,9 @@ const getPageNumbers: getPageNumbers = (view, perPage) => {
     return pageNumbers;
 };
 
-type validateSelectedPage = (input: string, max: number) => number;
+type validateSelectedPageType = (input: string, max: number) => number;
 
-const validateSelectedPage: validateSelectedPage = (input, max) => {
+const validateSelectedPage: validateSelectedPageType = (input, max) => {
     const page = Number(input);
     if (page < 1) { return 1; }
     if (page > max) { return max; }

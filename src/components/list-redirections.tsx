@@ -5,9 +5,12 @@ import { sortByMultipleProperties } from '../lib/utils';
 import { Redirection } from './redirection';
 import { Paginator } from './paginator';
 
-type getView = (state: RedirectsManagerContextInterface, orderby?: string, sort?: 'asc' | 'desc' ) => RedirectionsStore;
+type getViewType = (
+    state: RedirectsManagerContextInterface,
+    orderby?: string,
+    sort?: 'asc' | 'desc' ) => RedirectionsStore;
 
-const getView: getView = (state, orderby = 'modificationDate', sort = 'asc') => {
+const getView: getViewType = (state, orderby = 'modificationDate', sort = 'asc') => {
     let view: RedirectionsStore = [...state.store];
     if (state.filterBy && state.filterBy !== '') {
         view = view.filter((el) => {
@@ -22,9 +25,9 @@ const getView: getView = (state, orderby = 'modificationDate', sort = 'asc') => 
     return view;
 };
 
-type paginateView = (state: RedirectsManagerContextInterface, store: RedirectionsStore) => RedirectionsStore;
+type paginateViewType = (state: RedirectsManagerContextInterface, store: RedirectionsStore) => RedirectionsStore;
 
-const paginateView: paginateView = (state, store) => {
+const paginateView: paginateViewType = (state, store) => {
     const perPage = state.perPage ? state.perPage : store.length;
     const currentPage = state.currentPage ? state.currentPage : 1;
     return store.slice((currentPage - 1) * perPage, (currentPage * perPage) );

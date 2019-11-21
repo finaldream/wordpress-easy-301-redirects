@@ -9,16 +9,16 @@ import { SaveNotification } from '../components/save-notification';
 
 const ajaxUrl: string = (window as any).ajaxurl;
 
-type showNotification = (type: TypeOptions, content: ToastContent, options?: ToastOptions ) => React.ReactText;
+type showNotificationType = (type: TypeOptions, content: ToastContent, options?: ToastOptions ) => React.ReactText;
 
-export const showNotification: showNotification = (type, content, options = {}) => {
+export const showNotification: showNotificationType = (type, content, options = {}) => {
     options.type = type;
     return toast(content, options);
 };
 
-type validatedLoad = (state: RedirectsManagerContextInterface) => RedirectsManagerContextInterface;
+type validatedLoadType = (state: RedirectsManagerContextInterface) => RedirectsManagerContextInterface;
 
-export const validateLoad: validatedLoad = (state) => {
+export const validateLoad: validatedLoadType = (state) => {
     let valid = true;
     state.store = state.store.map((redirection) => {
         if (!redirection.id || redirection.id === '') {
@@ -37,9 +37,9 @@ export const validateLoad: validatedLoad = (state) => {
     return checkRepeatedRequests(state);
 };
 
-type saveState = (state: RedirectsManagerContextInterface) => Promise<RedirectsManagerContextInterface>;
+type saveStateType = (state: RedirectsManagerContextInterface) => Promise<RedirectsManagerContextInterface>;
 
-export const saveState: saveState = async (state) => {
+export const saveState: saveStateType = async (state) => {
     const payload = {wildcard: state.wildcard, store: state.store};
     const init = {
         method: 'POST',
@@ -90,9 +90,9 @@ export const saveState: saveState = async (state) => {
     }
 };
 
-type sortByProperty = ({}, {}, property: string ) => number;
+type sortByPropertyType = ({}, {}, property: string ) => number;
 
-export const sortByProperty: sortByProperty = (a, b, property) => {
+export const sortByProperty: sortByPropertyType = (a, b, property) => {
     let sortOrder: -1|1 = 1;
     if (property[0] === '-') {
         sortOrder = -1;
@@ -102,9 +102,9 @@ export const sortByProperty: sortByProperty = (a, b, property) => {
     return ( (a[property] < b[property]) ? -1 : (a[property] > b[property]) ? 1 : 0 ) * sortOrder;
 };
 
-type sortByMultipleProperties = ({}, {}, properties: string[] ) => number;
+type sortByMultiplePropertiesType = ({}, {}, properties: string[] ) => number;
 
-export const sortByMultipleProperties: sortByMultipleProperties = (a, b, properties) => {
+export const sortByMultipleProperties: sortByMultiplePropertiesType = (a, b, properties) => {
     let i = 0;
     let result = 0;
     const numberOfProperties = properties.length;
@@ -115,9 +115,9 @@ export const sortByMultipleProperties: sortByMultipleProperties = (a, b, propert
     return result;
 };
 
-type checkRepeatedRequests = ( state: RedirectsManagerContextInterface) => RedirectsManagerContextInterface;
+type checkRepeatedRequestsType = ( state: RedirectsManagerContextInterface) => RedirectsManagerContextInterface;
 
-export const checkRepeatedRequests: checkRepeatedRequests = (state) => {
+export const checkRepeatedRequests: checkRepeatedRequestsType = (state) => {
     const repeatedRequest: string[] = transform( countBy(state.store, (el) => el.request), (result, count, value) => {
         if (count > 1) { result.push(value); }
     }, [] );

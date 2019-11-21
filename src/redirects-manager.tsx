@@ -48,15 +48,16 @@ export class RedirectsManager extends React.Component<RedirectsManagerProps> {
 
     public defaultProps: RedirectsManagerProps;
 
+    private validatedState: RedirectsManagerContextInterface = validateLoad(this.props.initialState);
+
     constructor(props: RedirectsManagerProps) {
         super(props);
     }
 
     public render(): JSX.Element {
-        const validatedState = validateLoad(this.props.initialState);
         return (
         <RedirectsManagerProvider>
-            <RedirectsManagerComponent initialState={validatedState} />
+            <RedirectsManagerComponent initialState={this.validatedState} />
             <ToastContainer position="bottom-right"/>
         </RedirectsManagerProvider>
         );

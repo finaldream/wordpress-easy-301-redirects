@@ -3,10 +3,10 @@
     "version": "1.0.0",
     "description": "Frontend component for wordpress-easy-301-redirects",
     "scripts": {
-        "build": "./node_modules/.bin/webpack",
-        "watch": "./node_modules/.bin/webpack -w",
-        "test": "./node_modules/.bin/tsc --noEmit",
-        "lint": "./node_modules/.bin/tslint -c ./tslint.json -p ./tsconfig.json"
+        "build": "webpack",
+        "watch": "webpack -w",
+        "test": "tsc --noEmit",
+        "lint": "tslint -c ./tslint.json -p ./tsconfig.json"
     },
     "dependencies": {
         "lodash": "^4.17.15",

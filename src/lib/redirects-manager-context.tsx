@@ -48,7 +48,11 @@ type Action = {type: 'saving-state', value: boolean} |
               {type: 'edit', value: RedirectionProps} |
               {type: 'set', value: RedirectsManagerContextInterface};
 
-const redirectsManagerReduducer = (state: RedirectsManagerContextInterface, action: Action) => {
+type RedirectsManagerReducerType = (
+    state: RedirectsManagerContextInterface,
+    action: Action) => RedirectsManagerContextInterface;
+
+const redirectsManagerReduducer: RedirectsManagerReducerType = (state, action) => {
     switch (action.type) {
 
         case 'add': {

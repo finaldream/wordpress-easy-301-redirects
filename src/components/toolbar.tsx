@@ -1,7 +1,6 @@
 import * as React from 'react';
 
 import { useRedirectsManagerState, useRedirectsManagerDispatch, updateServerState } from '../lib/redirects-manager-context';
-import { stat } from 'fs';
 
 const AddNew = () => {
     const dispatch = useRedirectsManagerDispatch();
