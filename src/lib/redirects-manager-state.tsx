@@ -3,7 +3,6 @@ import { saveState, checkRepeatedRequests } from './utils';
 
 export interface RedirectsManagerStateInterface {
     store: RedirectionProps[];
-    wildcard: boolean;
     saving?: boolean;
     lastSave?: Date;
     lastModification?: Date;
@@ -29,7 +28,6 @@ type Action = {type: 'saving-state', value: boolean} |
               {type: 'add', value: null} |
               {type: 'remove', value: RedirectionProps} |
               {type: 'edit', value: RedirectionProps} |
-              {type: 'toggle-wildcard', value: boolean} |
               {type: 'set-filter', value: string} |
               {type: 'set-current-page', value: number} |
               {type: 'set', value: RedirectsManagerStateInterface};
@@ -92,16 +90,12 @@ export const redirectsManagerReducer: RedirectsManagerReducerType = (state, acti
             return newState;
         }
 
-        case 'toggle-wildcard': {
-            const newState = {...state};
-            newState.wildcard = action.value;
-            return newState;
-        }
         case 'set-filter': {
             const newState = {...state};
             newState.filterBy = action.value;
             return newState;
         }
+
         case 'set-current-page': {
             const newState = {...state};
             newState.currentPage = action.value;

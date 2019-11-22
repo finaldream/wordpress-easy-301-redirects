@@ -44,15 +44,6 @@ export const Toolbar = ({state, dispatch}: ToolbatProps) => {
                             !state.saving ? () => updateServerState({dispatch, state})
                             : event.preventDefault}
                             toggle={state.saving}/>
-                        <input type="checkbox"
-                            style={{marginTop: '5px'}}
-                            name="e301r-wildcard"
-                            checked={state.wildcard}
-                            onChange={() => dispatch({type: 'toggle-wildcard' , value: !state.wildcard })}
-                        />
-                        <label htmlFor="e301r-wildcard" style={{marginLeft: '5px', marginTop: '5px'}}>
-                            Use Wildcard?
-                        </label>
                         </div>
                         <div className="alignright actions" style={{display: 'flex'}}>
                             <label htmlFor="wer-filterby" style={{marginRight: '5px', marginTop: '5px'}}>

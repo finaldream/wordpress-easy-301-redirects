@@ -45,7 +45,7 @@ RedirectsManager.displayName = 'RedirectsManager';
 export class MountRedirectsManager extends React.Component<RedirectsManagerProps> {
 
     public static defaultProps: RedirectsManagerProps = {
-        initialState : {wildcard: false, store: [], filterBy: '', saving: false, lastModification: null, lastSave: null}
+        initialState : {store: [], filterBy: '', saving: false, lastModification: null, lastSave: null}
     };
 
     public static displayName: 'MountRedirectsManager';

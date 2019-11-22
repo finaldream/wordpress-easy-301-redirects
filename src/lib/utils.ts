@@ -46,7 +46,7 @@ export const validateLoad: validatedLoadType = (state) => {
 };
 
 export const saveState: saveStateType = async (state) => {
-    const payload = {wildcard: state.wildcard, store: state.store};
+    const payload = {store: state.store};
     const init = {
         method: 'POST',
         headers: {
@@ -66,8 +66,7 @@ export const saveState: saveStateType = async (state) => {
             redirects_added: number,
             redirects_modified: number,
             redirects_deleted: number,
-            store: RedirectionProps[],
-            wildcard: boolean
+            store: RedirectionProps[]
         }};
         try {
             json = await result.json();
@@ -78,13 +77,12 @@ export const saveState: saveStateType = async (state) => {
         if (json.data.redirects_added === 0 &&
             json.data.redirects_modified === 0 &&
             json.data.redirects_deleted === 0) {
-            showNotification('success', `No changes to redirections. Wildcars is ${json.data.wildcard ? 'active' :  'inactive'}` );
+            showNotification('warning', 'No changes to redirections.' );
         } else {
             const notificationMsg = !state.imported ? SaveNotification({
                 added: json.data.redirects_added,
                 modified: json.data.redirects_modified,
                 deleted: json.data.redirects_deleted,
-                wildcard: json.data.wildcard
             }) : 'Success! Your first save is done! Please deactivate Simple 301 Redirects plugin to avoid conflicts';
             showNotification('success', notificationMsg);
         }

@@ -2,7 +2,7 @@
 /*
 Plugin Name: Wordpress Easy 301 Redirects
 Plugin URI: https://github.com/finaldream/wordpress-easy-301-redirects
-Description: Create a list of URLs that you would like to 301 redirect to another page or site. Now with wildcard support.
+Description: Create a list of URLs that you would like to 301 redirect to another page or site. Wildcard support is always enabled.
 Version: 1.0.0
 Author: Finaldream.de
 Author URI: https://www.finaldream.de
@@ -40,29 +40,28 @@ class Easy301RedirectsPlugin {
     public function getRedirectsJson() : string
     {
         $redirects = $this->getRedirects();
-        return json_encode($redirects);
+        return json_encode(['store' => $redirects]);
     }
 
     /**
-     * redirect function
+     * redirect
+     * 
      * Read the list of redirects and if the current page 
      * is found in the list, send the visitor on her way
      * 
      * @return void
      */
-    public function redirect() {
+    public function redirect()
+    {
         $userrequest = str_ireplace(get_option('home'),'',$this->getAddress());
         $userrequest = rtrim($userrequest,'/');
-        $currentState = $this->getRedirects();
-        $redirects =  $currentState['store'];
-        $wildcard = $currentState['wildcard'];
+        $redirects = $this->getRedirects();
         if (!empty($redirects)) { 
             $do_redirect = '';
             foreach ($redirects as $easyRedirection) {
                 $storedrequest = $easyRedirection->getRequest();
                 $destination = $easyRedirection->getDestination();
-                if ($wildcard === 'true' && strpos($storedrequest,'*') !== false) {
-
+                if (strpos($storedrequest,'*') !== false) {
                     if ( strpos($userrequest, '/wp-login') !== 0 && strpos($userrequest, '/wp-admin') !== 0 ) {
                         $storedrequest = str_replace('*','(.*)',$storedrequest);
                         $pattern = '/^' . str_replace( '/', '\/', rtrim( $storedrequest, '/' ) ) . '/';
@@ -89,12 +88,12 @@ class Easy301RedirectsPlugin {
               
             }
         }
-        return;
     }
 
     /**
-     * saveRedirects function
-     * save the redirects from the options page to the database
+     * saveRedirects
+     * 
+     * Save the redirects received in the ajax endpoint to the database
      * 
      * @return void
      */
@@ -104,9 +103,7 @@ class Easy301RedirectsPlugin {
 
         $input = json_decode(file_get_contents('php://input'));
         $data = $input->store;
-        $wildcard = $input->wildcard;
-        $currentState = $this->getRedirects();
-        $redirects = $currentState['store'];
+        $redirects = $this->getRedirects();
         $result = [];
         $added = 0;
         $modified = 0;
@@ -129,7 +126,6 @@ class Easy301RedirectsPlugin {
                     }
                 }
             }
-            update_option('easy_301_redirects_wildcard', $wildcard);
             update_option('easy_301_redirects', $result);
         } catch (\Throwable $th) {
             wp_send_json_error( $th->getMessage(), 500 );
@@ -139,13 +135,13 @@ class Easy301RedirectsPlugin {
             'redirects_added' => $added,
             'redirects_modified' => $modified,
             'redirects_deleted' => $deleted,
-            'store' => $result,
-            'wildcard' => $wildcard
+            'store' => $result
             ]);
     }
 
     /**
-     * getAddress function
+     * getAddress
+     * 
      * utility function to get the full address of the current request
      * credit: http://www.phpro.org/examples/Get-Full-URL.html
      *
@@ -157,7 +153,7 @@ class Easy301RedirectsPlugin {
     }
 
      /**
-     * getProtocol function
+     * getProtocol
      *
      * @return string
      */
@@ -174,7 +170,8 @@ class Easy301RedirectsPlugin {
     } 
 
     /**
-     * getRedirects function
+     * getRedirects
+     * 
      * return the current array of redirects
      * 
      * @return array
@@ -182,20 +179,18 @@ class Easy301RedirectsPlugin {
     private function getRedirects() : array
     {
         $redirects = get_option('easy_301_redirects');
-        $wildcard = boolval(get_option('easy_301_redirects_wildcard'));
         if (empty($redirects)) {
-            $result = $this->migrateRedirectsFormat();
-        } else {
-            $result = ['store' => $redirects, 'wildcard' => $wildcard];
+            $redirects = $this->migrateRedirectsFormat();
         }
-        return $result;
+        return $redirects;
     }
 
     /**
-     * migrateRedirectsFormat private function
+     * migrateRedirectsFormat
+     * 
      * Check if previous SimpleRedirects option exists and load it into new option
-     * Transform them into Easy301Redirection objects and create the storage
-     * returns a normalized array containing only Easy301Redirection objects
+     * Transform them into Easy301Redirection objects and returns a normalized array 
+     * containing only Easy301Redirection objects
      *
      * @return array
      */
@@ -203,14 +198,15 @@ class Easy301RedirectsPlugin {
     {
         $result = [];
         $redirects = get_option('301_redirects');
-        $wildcard = boolval(get_option('301_redirects_wildcard'));
         if (!empty($redirects)) {
+            $i = 0;
             foreach ($redirects as $request => $destination) {
-                $redirection = new EasyRedirection($request, $destination, '', -1);
+                $redirection = new EasyRedirection($request, $destination, '', $i);
                 $result[] = $redirection;
+                $i++;
             }
         }
-        return ['store' => $result, 'wildcard' => $wildcard];
+        return $result;
     }
 }
 
