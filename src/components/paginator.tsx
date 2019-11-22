@@ -9,7 +9,7 @@ type validateSelectedPageType = (input: string, max: number) => number;
 interface PaginatorComponentProps {
     viewLength: number;
     filterBy: string;
-    storeLength: number;
+    redirectsLength: number;
     perPage: number;
     currentPage: number;
     dispatch: Dispatch;
@@ -56,7 +56,7 @@ const PageSelector = ( { pageNumbers, current, dispatch }: PageSelectorProps) =>
 export const Paginator = ({
     viewLength,
     filterBy,
-    storeLength,
+    redirectsLength,
     perPage, currentPage,
     dispatch }: PaginatorComponentProps) => {
     const filteredCount = (filterBy && filterBy !== '') ? `(Current search: ${viewLength})` : '';
@@ -64,7 +64,7 @@ export const Paginator = ({
         <tr>
             <th colSpan={5}>
                 <hr/>
-                Redirects: {storeLength} { filteredCount }
+                Redirects: {redirectsLength} { filteredCount }
                 <PageSelector
                     pageNumbers={getPageNumbers(viewLength, perPage)}
                     current={currentPage} dispatch={dispatch} />

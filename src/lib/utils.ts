@@ -28,7 +28,7 @@ export const showNotification: showNotificationType = (type, content, options = 
 
 export const validateLoad: validatedLoadType = (state) => {
     let valid = true;
-    state.store = state.store.map((redirection) => {
+    state.redirects = state.redirects.map((redirection) => {
         if (!redirection.id || redirection.id === '') {
             redirection.id = v4();
             redirection.modificationDate = 'not saved';
@@ -46,7 +46,7 @@ export const validateLoad: validatedLoadType = (state) => {
 };
 
 export const saveState: saveStateType = async (state) => {
-    const payload = {store: state.store};
+    const payload = {redirects: state.redirects};
     const init = {
         method: 'POST',
         headers: {
@@ -66,7 +66,7 @@ export const saveState: saveStateType = async (state) => {
             redirects_added: number,
             redirects_modified: number,
             redirects_deleted: number,
-            store: RedirectionProps[]
+            redirects: RedirectionProps[]
         }};
         try {
             json = await result.json();
@@ -86,7 +86,7 @@ export const saveState: saveStateType = async (state) => {
             }) : 'Success! Your first save is done! Please deactivate Simple 301 Redirects plugin to avoid conflicts';
             showNotification('success', notificationMsg);
         }
-        const final: RedirectsManagerStateInterface = {...state, store: json.data.store};
+        const final: RedirectsManagerStateInterface = {...state, redirects: json.data.redirects};
         return validateLoad(final);
     } else {
         showNotification('error', 'An Error ocurred! Changes not saved');
@@ -116,9 +116,10 @@ export const sortByMultipleProperties: sortByMultiplePropertiesType = (a, b, pro
 };
 
 export const checkRepeatedRequests: checkRepeatedRequestsType = (state) => {
-    const repeatedRequest: string[] = transform( countBy(state.store, (el) => el.request), (result, count, value) => {
+    const repeatedRequest: string[] = transform(
+        countBy(state.redirects, (el) => el.request), (result, count, value) => {
         if (count > 1) { result.push(value); }
     }, [] );
-    state.store.map( (el) => el.warningRequestDuplication = repeatedRequest.includes(el.request));
+    state.redirects.map( (el) => el.warningRequestDuplication = repeatedRequest.includes(el.request));
     return state;
 };

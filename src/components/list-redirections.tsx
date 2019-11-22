@@ -6,24 +6,24 @@ import { Redirection } from './redirection';
 import { Paginator } from './paginator';
 
 type getViewType = (
-    store: RedirectionProps[],
+    redirects: RedirectionProps[],
     filterBy: string,
     orderby?: string,
     sort?: 'asc' | 'desc'
     ) => RedirectionProps[];
 
 interface ListRedirectionsProps {
-        store: RedirectionProps[];
-        filterBy: string;
-        perPage: number;
-        currentPage: number;
-        dispatch: Dispatch;
-    }
+    redirects: RedirectionProps[];
+    filterBy: string;
+    perPage: number;
+    currentPage: number;
+    dispatch: Dispatch;
+}
 
-type paginateViewType = (store: RedirectionProps[],  perPage: number, currentPage: number) => RedirectionProps[];
+type paginateViewType = (redirects: RedirectionProps[],  perPage: number, currentPage: number) => RedirectionProps[];
 
-const getView: getViewType = (store, filterBy, orderby = 'modificationDate', sort = 'asc') => {
-    let view: RedirectionProps[] = [...store];
+const getView: getViewType = (redirects, filterBy, orderby = 'modificationDate', sort = 'asc') => {
+    let view: RedirectionProps[] = [...redirects];
     if (filterBy && filterBy !== '') {
         view = view.filter((el) => {
             return (
@@ -37,15 +37,15 @@ const getView: getViewType = (store, filterBy, orderby = 'modificationDate', sor
     return view;
 };
 
-const paginateView: paginateViewType = (store, perPage, currentPage) => {
-    const countPerPage = perPage ? perPage : store.length;
+const paginateView: paginateViewType = (redirects, perPage, currentPage) => {
+    const countPerPage = perPage ? perPage : redirects.length;
     const page = currentPage ? currentPage : 1;
-    return store.slice((page - 1) * countPerPage, (page * countPerPage) );
+    return redirects.slice((page - 1) * countPerPage, (page * countPerPage) );
 };
 
 export const ListRedirections: React.FunctionComponent<ListRedirectionsProps> = (
-    {store, filterBy, perPage, currentPage, dispatch}: ListRedirectionsProps) => {
-    const view = getView(store, filterBy);
+    {redirects, filterBy, perPage, currentPage, dispatch}: ListRedirectionsProps) => {
+    const view = getView(redirects, filterBy);
     const paginated = paginateView(view, perPage, currentPage);
     return (
         <tbody>
@@ -55,7 +55,7 @@ export const ListRedirections: React.FunctionComponent<ListRedirectionsProps> = 
             })
             }
             <Paginator
-                storeLength={store.length}
+                redirectsLength={redirects.length}
                 viewLength={view.length}
                 currentPage={currentPage}
                 perPage={perPage}

@@ -30,7 +30,7 @@ export const RedirectsManager = ({initialState}: RedirectsManagerProps) => {
                     </tr>
                 </thead>
                 <ListRedirections
-                    store={state.store}
+                    redirects={state.redirects}
                     filterBy={state.filterBy}
                     perPage={state.perPage}
                     currentPage={state.currentPage}
@@ -45,7 +45,7 @@ RedirectsManager.displayName = 'RedirectsManager';
 export class MountRedirectsManager extends React.Component<RedirectsManagerProps> {
 
     public static defaultProps: RedirectsManagerProps = {
-        initialState : {store: [], filterBy: '', saving: false, lastModification: null, lastSave: null}
+        initialState : {redirects: [], filterBy: '', saving: false, lastModification: null, lastSave: null}
     };
 
     public static displayName: 'MountRedirectsManager';

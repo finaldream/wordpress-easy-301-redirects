@@ -40,7 +40,7 @@ class Easy301RedirectsPlugin {
     public function getRedirectsJson() : string
     {
         $redirects = $this->getRedirects();
-        return json_encode(['store' => $redirects]);
+        return json_encode(['redirects' => $redirects]);
     }
 
     /**
@@ -102,7 +102,7 @@ class Easy301RedirectsPlugin {
         if ( !current_user_can('manage_options') )  { wp_send_json_error( 'You do not have sufficient permissions to access this page.', 403 ); }
 
         $input = json_decode(file_get_contents('php://input'));
-        $data = $input->store;
+        $data = $input->redirects;
         $redirects = $this->getRedirects();
         $result = [];
         $added = 0;
@@ -135,7 +135,7 @@ class Easy301RedirectsPlugin {
             'redirects_added' => $added,
             'redirects_modified' => $modified,
             'redirects_deleted' => $deleted,
-            'store' => $result
+            'redirects' => $result
             ]);
     }
 

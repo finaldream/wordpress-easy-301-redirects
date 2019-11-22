@@ -2,7 +2,7 @@ import { v4 } from 'uuid';
 import { saveState, checkRepeatedRequests } from './utils';
 
 export interface RedirectsManagerStateInterface {
-    store: RedirectionProps[];
+    redirects: RedirectionProps[];
     saving?: boolean;
     lastSave?: Date;
     lastModification?: Date;
@@ -52,18 +52,18 @@ export const redirectsManagerReducer: RedirectsManagerReducerType = (state, acti
 
         case 'add': {
             const newState = {...state};
-            newState.store.push({id: v4(), modificationDate: 'not saved'});
+            newState.redirects.push({id: v4(), modificationDate: 'not saved'});
             newState.currentPage = 1;
             return newState;
         }
 
         case 'edit': {
             const newState = {...state};
-            const index = newState.store.findIndex((el) => {
+            const index = newState.redirects.findIndex((el) => {
                 return el.id === action.value.id;
             });
             if (index !== -1) {
-                newState.store[index] = action.value;
+                newState.redirects[index] = action.value;
             }
             newState.lastModification = new Date();
             const validatedState = checkRepeatedRequests(newState);
@@ -72,7 +72,7 @@ export const redirectsManagerReducer: RedirectsManagerReducerType = (state, acti
 
         case 'remove': {
             const newState = {...state};
-            newState.store = newState.store.filter((el) => {
+            newState.redirects = newState.redirects.filter((el) => {
                 return el.id !== action.value.id;
             });
             newState.lastModification = new Date();
