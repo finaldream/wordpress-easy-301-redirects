@@ -2,10 +2,6 @@ import * as React from 'react';
 
 import { Dispatch } from '../lib/redirects-manager-state';
 
-type getPageNumbersType = (viewLength: number, perPage: number) => number[];
-
-type validateSelectedPageType = (input: string, max: number) => number;
-
 interface PaginatorComponentProps {
     viewLength: number;
     filterBy: string;
@@ -17,7 +13,7 @@ interface PaginatorComponentProps {
 
 interface PageSelectorProps { pageNumbers: number[]; current: number; dispatch: Dispatch; }
 
-const getPageNumbers: getPageNumbersType = (viewLength, perPage) => {
+const getPageNumbers = (viewLength: number, perPage: number) => {
     const pageNumbers = [];
     const calculatedPerPage = perPage ? perPage : viewLength;
     for (let i = 1; i <= Math.ceil(viewLength / calculatedPerPage); i++) {
@@ -26,7 +22,7 @@ const getPageNumbers: getPageNumbersType = (viewLength, perPage) => {
     return pageNumbers;
 };
 
-const validateSelectedPage: validateSelectedPageType = (input, max) => {
+const validateSelectedPage = (input: string, max: number) => {
     const page = Number(input);
     if (page < 1) { return 1; }
     if (page > max) { return max; }

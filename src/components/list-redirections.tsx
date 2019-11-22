@@ -5,13 +5,6 @@ import { sortByMultipleProperties } from '../lib/utils';
 import { Redirection } from './redirection';
 import { Paginator } from './paginator';
 
-type getViewType = (
-    redirects: RedirectionProps[],
-    filterBy: string,
-    orderby?: string,
-    sort?: 'asc' | 'desc'
-    ) => RedirectionProps[];
-
 interface ListRedirectionsProps {
     redirects: RedirectionProps[];
     filterBy: string;
@@ -20,9 +13,12 @@ interface ListRedirectionsProps {
     dispatch: Dispatch;
 }
 
-type paginateViewType = (redirects: RedirectionProps[],  perPage: number, currentPage: number) => RedirectionProps[];
-
-const getView: getViewType = (redirects, filterBy, orderby = 'modificationDate', sort = 'asc') => {
+const getView = (
+        redirects: RedirectionProps[],
+        filterBy: string,
+        orderby: string = 'modificationDate',
+        sort: 'asc' | 'desc' = 'asc'
+    ) => {
     let view: RedirectionProps[] = [...redirects];
     if (filterBy && filterBy !== '') {
         view = view.filter((el) => {
@@ -37,7 +33,7 @@ const getView: getViewType = (redirects, filterBy, orderby = 'modificationDate',
     return view;
 };
 
-const paginateView: paginateViewType = (redirects, perPage, currentPage) => {
+const paginateView = (redirects: RedirectionProps[],  perPage: number, currentPage: number) => {
     const countPerPage = perPage ? perPage : redirects.length;
     const page = currentPage ? currentPage : 1;
     return redirects.slice((page - 1) * countPerPage, (page * countPerPage) );
