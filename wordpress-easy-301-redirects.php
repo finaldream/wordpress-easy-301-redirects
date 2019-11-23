@@ -138,7 +138,7 @@ class Easy301RedirectsPlugin {
             'redirects_added' => $added,
             'redirects_modified' => $modified,
             'redirects_deleted' => $deleted,
-            'redirects' => $result
+            'redirects' => $this->getRedirects()
             ]);
     }
 
