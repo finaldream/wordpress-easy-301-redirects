@@ -1,6 +1,10 @@
 import * as React from 'react';
 
-import { updateServerState, RedirectsManagerStateInterface, Dispatch } from '../lib/redirects-manager-state';
+import { updateServerState, RedirectsManagerStateInterface, Dispatch, RedirectionProps } from '../lib/redirects-manager-state';
+import { ListRedirections } from './list-redirections';
+import { Paginator } from './paginator';
+
+import { sortByMultipleProperties } from '../lib/utils';
 
 interface ButtonsProps extends React.DOMAttributes<HTMLAnchorElement> {
     toggle?: boolean;
@@ -15,15 +19,15 @@ interface ToolbatProps  {
 const AddNew = ({onClick}: ButtonsProps) => {
     return (
     <a className="button" onClick={onClick} >
-      Add new Redirection
+      Add
     </a>
     );
 };
 
 const Save = ({toggle, onClick}: ButtonsProps) => {
-    const txt = toggle ? 'Saving...' : 'Save Redirections';
+    const txt = toggle ? 'Saving' : 'Save';
     return (
-    <a className="button"
+    <a className="button button-primary"
         onClick={onClick}
         style={{marginLeft: '5px', cursor: toggle ? 'wait' : 'pointer'}}
         >
@@ -32,11 +36,44 @@ const Save = ({toggle, onClick}: ButtonsProps) => {
     );
 };
 
+const filter = (
+    redirects: RedirectionProps[],
+    filterBy: string,
+    orderby: string = 'modificationDate',
+    sort: 'asc' | 'desc' = 'asc',
+    ) => {
+    let view: RedirectionProps[] = [...redirects];
+    if (filterBy && filterBy !== '') {
+        view = view.filter((el) => {
+            return (
+                (el.request ? el.request.includes(filterBy) : true) ||
+                (el.destination ? el.destination.includes(filterBy) : true)
+            );
+        });
+    }
+    view = view.sort((a, b) => sortByMultipleProperties(a, b, [`-${orderby}`, 'order']));
+    if (sort === 'desc') { view.reverse(); }
+    return view;
+};
+
+const paginate = (
+    view: RedirectionProps[],
+    perPage: number,
+    currentPage: number,
+    ) => {
+        const countPerPage = perPage ? perPage : view.length;
+        const page = currentPage ? currentPage : 1;
+        return view.slice((page - 1) * countPerPage, (page * countPerPage) );
+};
+
 export const Toolbar = ({state, dispatch}: ToolbatProps) => {
+    const filtered = filter(state.redirects, state.filterBy);
+    const paginated = paginate(filtered, state.perPage, state.currentPage);
     return (
-        <thead>
+        <div>
+        <table className="widefat" id="toolbar" style={{width: '100%'}}>
             <tr>
-                <th colSpan={5}>
+                <th>
                     <div className="wer-toolbar">
                         <div className="alignleft actions" style={{display: 'flex'}}>
                         <AddNew onClick={(e) => dispatch({type: 'add', value: null})} />
@@ -65,7 +102,18 @@ export const Toolbar = ({state, dispatch}: ToolbatProps) => {
                     </div>
                 </th>
             </tr>
-        </thead>
+        </table>
+        <ListRedirections
+            view={paginated}
+            dispatch={dispatch} />
+        <Paginator
+                    redirectsLength={state.redirects.length}
+                    viewLength={filtered.length}
+                    currentPage={state.currentPage}
+                    perPage={state.perPage}
+                    dispatch={dispatch}
+                    filtered={(state.filterBy && state.filterBy !== '')} />
+        </div>
     );
 
 };

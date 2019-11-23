@@ -1,63 +1,35 @@
 import * as React from 'react';
 import { RedirectionProps, Dispatch } from '../lib/redirects-manager-state';
-import { sortByMultipleProperties } from '../lib/utils';
 
 import { Redirection } from './redirection';
 import { Paginator } from './paginator';
 
 interface ListRedirectionsProps {
-    redirects: RedirectionProps[];
-    filterBy: string;
-    perPage: number;
-    currentPage: number;
+    view: RedirectionProps[];
     dispatch: Dispatch;
 }
 
-const getView = (
-        redirects: RedirectionProps[],
-        filterBy: string,
-        orderby: string = 'modificationDate',
-        sort: 'asc' | 'desc' = 'asc'
-    ) => {
-    let view: RedirectionProps[] = [...redirects];
-    if (filterBy && filterBy !== '') {
-        view = view.filter((el) => {
-            return (
-                (el.request ? el.request.includes(filterBy) : true) ||
-                (el.destination ? el.destination.includes(filterBy) : true)
-            );
-        });
-    }
-    view = view.sort((a, b) => sortByMultipleProperties(a, b, [`-${orderby}`, 'order']));
-    if (sort === 'desc') { view.reverse(); }
-    return view;
-};
-
-const paginateView = (redirects: RedirectionProps[],  perPage: number, currentPage: number) => {
-    const countPerPage = perPage ? perPage : redirects.length;
-    const page = currentPage ? currentPage : 1;
-    return redirects.slice((page - 1) * countPerPage, (page * countPerPage) );
-};
-
 export const ListRedirections: React.FunctionComponent<ListRedirectionsProps> = (
-    {redirects, filterBy, perPage, currentPage, dispatch}: ListRedirectionsProps) => {
-    const view = getView(redirects, filterBy);
-    const paginated = paginateView(view, perPage, currentPage);
+    {view, dispatch}: ListRedirectionsProps) => {
     return (
-        <tbody>
-            {
-            paginated.map((redirection) => {
-                return <Redirection key={redirection.id} redirection={redirection} dispatch={dispatch} />;
-            })
-            }
-            <Paginator
-                redirectsLength={redirects.length}
-                viewLength={view.length}
-                currentPage={currentPage}
-                perPage={perPage}
-                dispatch={dispatch}
-                filterBy={filterBy} />
-        </tbody>
+        <table className="widefat" id="view" style={{width: '100%'}}>
+            <thead>
+                <tr>
+                    <th style={{width: '41%'}} >Request</th>
+                    <th style={{width: '2%'}} ></th>
+                    <th style={{width: '41%'}} >Destination</th>
+                    <th style={{width: '11%'}} >Last Modification</th>
+                    <th style={{width: '5%', textAlign: 'center'}} >Action</th>
+                </tr>
+            </thead>
+            <tbody>
+                {
+                view.map((redirection) => {
+                    return <Redirection key={redirection.id} redirection={redirection} dispatch={dispatch} />;
+                })
+                }
+            </tbody>
+        </table>
     );
 };
 ListRedirections.displayName = 'ListRedirections';

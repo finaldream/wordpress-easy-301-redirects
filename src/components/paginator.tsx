@@ -4,7 +4,7 @@ import { Dispatch } from '../lib/redirects-manager-state';
 
 interface PaginatorComponentProps {
     viewLength: number;
-    filterBy: string;
+    filtered: boolean;
     redirectsLength: number;
     perPage: number;
     currentPage: number;
@@ -51,20 +51,23 @@ const PageSelector = ( { pageNumbers, current, dispatch }: PageSelectorProps) =>
 
 export const Paginator = ({
     viewLength,
-    filterBy,
+    filtered,
     redirectsLength,
     perPage, currentPage,
     dispatch }: PaginatorComponentProps) => {
-    const filteredCount = (filterBy && filterBy !== '') ? `(Current search: ${viewLength})` : '';
+    const filteredCount = filtered ? `(Current search: ${viewLength})` : '';
     return (
-        <tr>
-            <th colSpan={5}>
-                <hr/>
-                Redirects: {redirectsLength} { filteredCount }
-                <PageSelector
-                    pageNumbers={getPageNumbers(viewLength, perPage)}
-                    current={currentPage} dispatch={dispatch} />
-            </th>
-        </tr>
+        <table className="widefat" id="paginator" style={{width: '100%'}}>
+            <tr>
+                <th>
+                    <div className="alignleft actions" style={{display: 'flex'}}>
+                        Redirects: {redirectsLength} { filteredCount }
+                    </div>
+                    <PageSelector
+                        pageNumbers={getPageNumbers(viewLength, perPage)}
+                        current={currentPage} dispatch={dispatch} />
+                </th>
+            </tr>
+        </table>
     );
 };

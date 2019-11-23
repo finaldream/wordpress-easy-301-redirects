@@ -7,7 +7,6 @@ import { RedirectsManagerStateInterface, redirectsManagerReducer, } from './lib/
 
 import { validateLoad } from './lib/utils';
 
-import { ListRedirections } from './components/list-redirections';
 import { Toolbar } from './components/toolbar';
 
 interface RedirectsManagerProps  {
@@ -18,24 +17,7 @@ export const RedirectsManager = ({initialState}: RedirectsManagerProps) => {
     const [state, dispatch] = React.useReducer(redirectsManagerReducer, initialState);
     return (
         <div>
-            <table className="widefat" style={{width: '100%'}}>
-                <Toolbar dispatch={dispatch} state={state} />
-                <thead>
-                    <tr>
-                        <th style={{width: '41%'}} >Request</th>
-                        <th style={{width: '2%'}} ></th>
-                        <th style={{width: '41%'}} >Destination</th>
-                        <th style={{width: '11%'}} >Last Modification</th>
-                        <th style={{width: '5%', textAlign: 'center'}} >Action</th>
-                    </tr>
-                </thead>
-                <ListRedirections
-                    redirects={state.redirects}
-                    filterBy={state.filterBy}
-                    perPage={state.perPage}
-                    currentPage={state.currentPage}
-                    dispatch={dispatch} />
-            </table>
+            <Toolbar dispatch={dispatch} state={state} />
             <ToastContainer position="bottom-right"/>
         </div>
     );
