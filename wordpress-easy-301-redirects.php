@@ -11,7 +11,7 @@ Author URI: https://www.finaldream.de
 namespace WordpressEasy301Redirects;
 
 require_once(__DIR__.'/Easy301Redirection.php');
-use WordpressEasy301Redirects\EasyRedirection;
+use WordpressEasy301Redirects\Easy301Redirection;
 use DateTime;
 
 
@@ -40,6 +40,9 @@ class Easy301RedirectsPlugin {
     public function getRedirectsJson() : string
     {
         $redirects = $this->getRedirects();
+        if (empty($redirects)) {
+            $redirects = $this->importFromSimple301();
+        }
         return json_encode(['redirects' => $redirects]);
     }
 
@@ -117,11 +120,11 @@ class Easy301RedirectsPlugin {
                     $updatedRequest = $current->setRequest($redirection->request);
                     $updatedDestination = $current->setDestination($redirection->destination);
                     if ($updatedRequest || $updatedDestination) $modified++;
-                    $result[] = $current;
+                    $result[] = json_encode($current);
                 } else {
                     if ($redirection->request && $redirection->destination && $redirection->id) {
-                        $new = new EasyRedirection($redirection->request, $redirection->destination, $redirection->id, sizeof($result), $transcationTime );
-                        $result[] = $new;
+                        $new = new Easy301Redirection($redirection->request, $redirection->destination, $redirection->id, sizeof($result), $transcationTime );
+                        $result[] = json_encode($new);
                         $added++;
                     }
                 }
@@ -178,30 +181,33 @@ class Easy301RedirectsPlugin {
      */
     private function getRedirects() : array
     {
+        $result = [];
         $redirects = get_option('easy_301_redirects');
-        if (empty($redirects)) {
-            $redirects = $this->migrateRedirectsFormat();
+        if (!empty($redirects)) {
+            foreach ($redirects as $key => $redirection) {
+                $result[$key] = (new Easy301Redirection())->jsonDecode($redirection);
+            }
         }
-        return $redirects;
+        return $result;
     }
 
     /**
-     * migrateRedirectsFormat
+     * importFromSimple301
      * 
-     * Check if previous SimpleRedirects option exists and load it into new option
+     * Check if previous SimpleRedirects option exists and load it
      * Transform them into Easy301Redirection objects and returns a normalized array 
      * containing only Easy301Redirection objects
      *
      * @return array
      */
-    private function migrateRedirectsFormat() : array
+    private function importFromSimple301() : array
     {
         $result = [];
         $redirects = get_option('301_redirects');
         if (!empty($redirects)) {
             $i = 0;
             foreach ($redirects as $request => $destination) {
-                $redirection = new EasyRedirection($request, $destination, '', $i);
+                $redirection = new Easy301Redirection($request, $destination, '', $i);
                 $result[] = $redirection;
                 $i++;
             }
