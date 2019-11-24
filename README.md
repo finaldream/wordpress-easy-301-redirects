@@ -6,6 +6,13 @@ Modern and Easy 301 redirects for Wordpress. Intend to replace Simple 301 Redire
 
 * Create HTTP 301 redirections from your Wordpress server routes, directly in the wp-admin
 * Use a modern GUI for better management of your redirections. 
+
+## Features
+
+* Wildcard is always active! End your request route with an `*` and it will be applied
+* Easely navigate, search and sort through your redirections list.
+* Export your redirections to a CSV file.  
+
   
 ## Installation
 
