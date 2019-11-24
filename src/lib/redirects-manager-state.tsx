@@ -24,12 +24,9 @@ export type Dispatch = (action: Action) => void;
 
 interface UpdateServerStateProps {dispatch: Dispatch; state: RedirectsManagerStateInterface; }
 
-type Action = {type: 'saving-state', value: boolean} |
-              {type: 'add', value: null} |
+type Action = {type: 'add', value: null} |
               {type: 'remove', value: RedirectionProps} |
               {type: 'edit', value: RedirectionProps} |
-              {type: 'set-filter', value: string} |
-              {type: 'set-current-page', value: number} |
               {type: 'set', value: Partial<RedirectsManagerStateInterface>};
 
 type RedirectsManagerReducerType = (
@@ -37,12 +34,12 @@ type RedirectsManagerReducerType = (
     action: Action) => RedirectsManagerStateInterface;
 
 export const updateServerState = async ({dispatch, state}: UpdateServerStateProps) => {
-    dispatch({type: 'saving-state', value: true});
+    dispatch({type: 'set', value: {saving: true}});
     try {
         const newState = await saveState(state);
         dispatch({type: 'set', value: {...newState, lastSave: new Date(), saving: false}});
     } catch (e) {
-        dispatch({type: 'saving-state', value: false});
+        dispatch({type: 'set', value: {saving: false}});
     }
     return;
 };
@@ -82,24 +79,6 @@ export const redirectsManagerReducer: RedirectsManagerReducerType = (state, acti
 
         case 'set': {
             const newState = {...state, ...action.value};
-            return newState;
-        }
-
-        case 'saving-state': {
-            const newState = {...state};
-            newState.saving = action.value;
-            return newState;
-        }
-
-        case 'set-filter': {
-            const newState = {...state};
-            newState.filterBy = action.value;
-            return newState;
-        }
-
-        case 'set-current-page': {
-            const newState = {...state};
-            newState.currentPage = action.value;
             return newState;
         }
 

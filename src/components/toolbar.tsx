@@ -72,6 +72,7 @@ export const Toolbar = ({state, dispatch}: ToolbatProps) => {
     return (
         <div>
         <table className="widefat" id="toolbar" style={{width: '100%'}}>
+            <tbody>
             <tr>
                 <th>
                     <div className="wer-toolbar">
@@ -83,25 +84,26 @@ export const Toolbar = ({state, dispatch}: ToolbatProps) => {
                             toggle={state.saving}/>
                         </div>
                         <div className="alignright actions" style={{display: 'flex'}}>
-                            <label htmlFor="wer-filterby" style={{marginRight: '5px', marginTop: '5px'}}>
+                            <label htmlFor="filterby" style={{marginRight: '5px', marginTop: '5px'}}>
                                 Search:
                             </label>
                             <input
                                 onChange={(e) => dispatch(
                                     {
-                                        type: 'set-filter',
-                                        value: e.target.value
+                                        type: 'set',
+                                        value: {filterBy: e.target.value, currentPage: 1}
                                     }
                                 )}
                                 type="text"
                                 defaultValue={state.filterBy}
                                 style={{padding: '1px', width: '100%' }}
-                                id="wer-filterby"
-                                name="wer-filterby"/>
+                                id="filterby"
+                                name="filterby"/>
                         </div>
                     </div>
                 </th>
             </tr>
+            </tbody>
         </table>
         <ListRedirections
             view={paginated}

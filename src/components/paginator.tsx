@@ -51,6 +51,7 @@ export const Paginator = ({
     const filteredCount = filtered ? `(Current search: ${viewLength})` : '';
     return (
         <table className="widefat" id="paginator" style={{width: '100%'}}>
+            <tbody>
             <tr>
                 <th>
                     <div className="alignleft actions" style={{display: 'flex', marginTop: '15px'}}>
@@ -69,6 +70,7 @@ export const Paginator = ({
                     </div>
                 </th>
             </tr>
+            </tbody>
         </table>
     );
 };
