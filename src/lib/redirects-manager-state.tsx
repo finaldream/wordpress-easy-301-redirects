@@ -7,6 +7,7 @@ export interface RedirectsManagerStateInterface {
     lastSave?: Date;
     lastModification?: Date;
     filterBy?: string;
+    orderBy?: string;
     perPage?: number;
     currentPage?: number;
     imported?: boolean;

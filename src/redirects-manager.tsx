@@ -30,6 +30,7 @@ export class MountRedirectsManager extends React.Component<RedirectsManagerProps
         initialState : {
             redirects: [],
             filterBy: '',
+            orderBy: '-modificationDate',
             saving: false,
             lastModification: null,
             lastSave: null,

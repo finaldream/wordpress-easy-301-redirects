@@ -39,7 +39,7 @@ const Save = ({toggle, onClick}: ButtonsProps) => {
 const filter = (
     redirects: RedirectionProps[],
     filterBy: string,
-    orderby: string = 'modificationDate',
+    orderby: string,
     sort: 'asc' | 'desc' = 'asc',
     ) => {
     let view: RedirectionProps[] = [...redirects];
@@ -51,7 +51,7 @@ const filter = (
             );
         });
     }
-    view = view.sort((a, b) => sortByMultipleProperties(a, b, [`-${orderby}`, 'order']));
+    view = view.sort((a, b) => sortByMultipleProperties(a, b, [orderby, 'order']));
     if (sort === 'desc') { view.reverse(); }
     return view;
 };
@@ -67,7 +67,7 @@ const paginate = (
 };
 
 export const Toolbar = ({state, dispatch}: ToolbatProps) => {
-    const filtered = filter(state.redirects, state.filterBy);
+    const filtered = filter(state.redirects, state.filterBy, state.orderBy);
     const paginated = paginate(filtered, state.perPage, state.currentPage);
     return (
         <div>
@@ -107,6 +107,7 @@ export const Toolbar = ({state, dispatch}: ToolbatProps) => {
         </table>
         <ListRedirections
             view={paginated}
+            orderBy={state.orderBy}
             dispatch={dispatch} />
         <Paginator
                     redirectsLength={state.redirects.length}
