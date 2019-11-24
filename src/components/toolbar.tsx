@@ -1,4 +1,5 @@
 import * as React from 'react';
+import { CSVLink } from 'react-csv';
 
 import { updateServerState, RedirectsManagerStateInterface, Dispatch, RedirectionProps } from '../lib/redirects-manager-state';
 import { ListRedirections } from './list-redirections';
@@ -66,6 +67,14 @@ const paginate = (
         return view.slice((page - 1) * countPerPage, (page * countPerPage) );
 };
 
+const csvHeaders = [
+    { label: "Order", key: "order" },
+    { label: "Request", key: "request" },
+    { label: "Destination", key: "destination" },
+    { label: "Last Modification", key: "modificationDate" },
+    { label: "Duplicated?", key: "warningRequestDuplication" }
+  ];
+
 export const Toolbar = ({state, dispatch}: ToolbatProps) => {
     const filtered = filter(state.redirects, state.filterBy, state.orderBy);
     const paginated = paginate(filtered, state.perPage, state.currentPage);
@@ -82,6 +91,12 @@ export const Toolbar = ({state, dispatch}: ToolbatProps) => {
                             !state.saving ? () => updateServerState({dispatch, state})
                             : event.preventDefault}
                             toggle={state.saving}/>
+                        <CSVLink
+                            data={filtered}
+                            style={{marginLeft: '10px'}}
+                            filename={'redirects.csv'}
+                            headers={csvHeaders}
+                            className="button">Download as CSV</CSVLink>
                         </div>
                         <div className="alignright actions" style={{display: 'flex'}}>
                             <label htmlFor="filterby" style={{marginRight: '5px', marginTop: '5px'}}>

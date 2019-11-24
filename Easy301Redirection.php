@@ -108,15 +108,4 @@ class Easy301Redirection implements JsonSerializable
     {
         return $this->modificationDate ?? $this->creationDate;
     }
-
-    public function getCSVrow () : array
-    {
-        $row = [
-            trim( sanitize_text_field($this->request )), 
-            trim( sanitize_text_field($this->destination)), 
-            $this->creationDate->format('Y-m-d H:i:s'),            
-            $this->getModificationDate()->format('Y-m-d H:i:s'),
-        ];
-        return $row;
-    }
 }
