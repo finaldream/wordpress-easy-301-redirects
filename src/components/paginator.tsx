@@ -1,4 +1,6 @@
 import * as React from 'react';
+import Pagination from "react-js-pagination";
+import styled from 'styled-components';
 
 import { Dispatch } from '../lib/redirects-manager-state';
 
@@ -14,6 +16,17 @@ interface PaginatorComponentProps {
 interface PageSelectorProps { pageNumbers: number[]; current: number; dispatch: Dispatch; }
 
 interface PerPageSelectorProps { perPage: number; dispatch: Dispatch; }
+
+const PaginationWrapper = styled.div`
+    .pagination {
+        display: inline-flex;
+    }
+    li {
+        margin: 5px;
+        padding: 5px;
+        border: solid 1px blue;       
+    }
+`;
 
 const getPageNumbers = (viewLength: number, perPage: number) => {
     const pageNumbers = [];
@@ -41,7 +54,7 @@ const PerPageSelector = ({perPage, dispatch} : PerPageSelectorProps) => {
                 <a style={{cursor: 'pointer'}} onClick={(e) => dispatch({type: 'set', value: {perPage: option} })}>{option}</a> :
                 <span style={{cursor: 'default'}} >{option}</span>;
             const separator = (Math.max(...options) !== option) ? '|' : null;
-            return <div>&nbsp;{optionHTML}&nbsp;{separator}</div>
+            return <div key={option}>&nbsp;{optionHTML}&nbsp;{separator}</div>
         })
         }</div>
     )
@@ -71,7 +84,8 @@ export const Paginator = ({
     viewLength,
     filtered,
     redirectsLength,
-    perPage, currentPage,
+    perPage,
+    currentPage,
     dispatch }: PaginatorComponentProps) => {
     const filteredCount = filtered ? `(Current search: ${viewLength})` : '';
     return (
@@ -82,9 +96,17 @@ export const Paginator = ({
                         Redirects: {redirectsLength} { filteredCount }
                         <PerPageSelector perPage={perPage} dispatch={dispatch} />
                     </div>
-                    <PageSelector
-                        pageNumbers={getPageNumbers(viewLength, perPage)}
-                        current={currentPage} dispatch={dispatch} />
+                    <div className="alignright actions" style={{display: 'flex'}}>
+                        <PaginationWrapper>
+                        <Pagination 
+                            activePage={currentPage}
+                            itemsCountPerPage={perPage}
+                            totalItemsCount={viewLength}
+                            pageRangeDisplayed={5}
+                            onChange={(pageNumber: number) => dispatch({type: 'set', value: {currentPage: pageNumber}})}
+                            />
+                        </PaginationWrapper>
+                    </div>
                 </th>
             </tr>
         </table>
