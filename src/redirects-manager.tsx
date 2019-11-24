@@ -27,14 +27,22 @@ RedirectsManager.displayName = 'RedirectsManager';
 export class MountRedirectsManager extends React.Component<RedirectsManagerProps> {
 
     public static defaultProps: RedirectsManagerProps = {
-        initialState : {redirects: [], filterBy: '', saving: false, lastModification: null, lastSave: null}
+        initialState : {
+            redirects: [],
+            filterBy: '',
+            saving: false,
+            lastModification: null,
+            lastSave: null,
+            perPage: 25,
+        }
     };
 
     public static displayName: 'MountRedirectsManager';
 
     public render(): JSX.Element {
+        const init = {...MountRedirectsManager.defaultProps.initialState, ...this.props.initialState};
         return (
-            <RedirectsManager initialState={validateLoad(this.props.initialState)} />
+            <RedirectsManager initialState={validateLoad(init)} />
         );
     }
 }

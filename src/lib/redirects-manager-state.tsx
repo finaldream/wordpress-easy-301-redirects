@@ -30,7 +30,7 @@ type Action = {type: 'saving-state', value: boolean} |
               {type: 'edit', value: RedirectionProps} |
               {type: 'set-filter', value: string} |
               {type: 'set-current-page', value: number} |
-              {type: 'set', value: RedirectsManagerStateInterface};
+              {type: 'set', value: Partial<RedirectsManagerStateInterface>};
 
 type RedirectsManagerReducerType = (
     state: RedirectsManagerStateInterface,
@@ -81,7 +81,8 @@ export const redirectsManagerReducer: RedirectsManagerReducerType = (state, acti
         }
 
         case 'set': {
-            return action.value;
+            const newState = {...state, ...action.value};
+            return newState;
         }
 
         case 'saving-state': {

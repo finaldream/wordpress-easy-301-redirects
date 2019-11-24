@@ -13,6 +13,8 @@ interface PaginatorComponentProps {
 
 interface PageSelectorProps { pageNumbers: number[]; current: number; dispatch: Dispatch; }
 
+interface PerPageSelectorProps { perPage: number; dispatch: Dispatch; }
+
 const getPageNumbers = (viewLength: number, perPage: number) => {
     const pageNumbers = [];
     const calculatedPerPage = perPage ? perPage : viewLength;
@@ -28,6 +30,22 @@ const validateSelectedPage = (input: string, max: number) => {
     if (page > max) { return max; }
     return page;
 };
+
+const PerPageSelector = ({perPage, dispatch} : PerPageSelectorProps) => {
+    const options = [25, 50, 100];
+    return (
+        <div style={{display: 'inline-flex', marginLeft: '30px'}}>
+        Show:&nbsp;   {
+        options.map((option) => {
+            const optionHTML = (option !== perPage) ?
+                <a style={{cursor: 'pointer'}} onClick={(e) => dispatch({type: 'set', value: {perPage: option} })}>{option}</a> :
+                <span style={{cursor: 'default'}} >{option}</span>;
+            const separator = (Math.max(...options) !== option) ? '|' : null;
+            return <div>&nbsp;{optionHTML}&nbsp;{separator}</div>
+        })
+        }</div>
+    )
+}
 
 const PageSelector = ( { pageNumbers, current, dispatch }: PageSelectorProps) => {
     const currentPage = current ? current : 1;
@@ -62,6 +80,7 @@ export const Paginator = ({
                 <th>
                     <div className="alignleft actions" style={{display: 'flex'}}>
                         Redirects: {redirectsLength} { filteredCount }
+                        <PerPageSelector perPage={perPage} dispatch={dispatch} />
                     </div>
                     <PageSelector
                         pageNumbers={getPageNumbers(viewLength, perPage)}

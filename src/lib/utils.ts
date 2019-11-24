@@ -28,7 +28,6 @@ export const validateLoad = (state: RedirectsManagerStateInterface) => {
         state.imported = true;
         showNotification('info', 'Data imported from old Simple301 plugin. Please review and save your changes to commit. After saving please deactivate the old plugin.');
     }
-    state.perPage = 10;
     return checkRepeatedRequests(state);
 };
 
