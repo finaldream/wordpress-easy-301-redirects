@@ -68,11 +68,11 @@ const paginate = (
 };
 
 const csvHeaders = [
-    { label: "Order", key: "order" },
-    { label: "Request", key: "request" },
-    { label: "Destination", key: "destination" },
-    { label: "Last Modification", key: "modificationDate" },
-    { label: "Duplicated?", key: "warningRequestDuplication" }
+    { label: 'Order', key: 'order' },
+    { label: 'Request', key: 'request' },
+    { label: 'Destination', key: 'destination' },
+    { label: 'Last Modification', key: 'modificationDate' },
+    { label: 'Duplicated?', key: 'warningRequestDuplication' }
   ];
 
 export const Toolbar = ({state, dispatch}: ToolbatProps) => {

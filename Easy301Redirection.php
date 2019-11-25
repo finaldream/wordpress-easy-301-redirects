@@ -47,7 +47,6 @@ class Easy301Redirection implements JsonSerializable
     public function jsonDecode(string $data) : Easy301Redirection
     {
         $obj = json_decode($data);
-        //var_dump($obj);die;
         $this->id = $obj->id;
         $this->request =  $obj->request;
         $this->destination =  $obj->destination;
