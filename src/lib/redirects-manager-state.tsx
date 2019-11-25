@@ -19,6 +19,7 @@ export interface RedirectionProps {
     destination?: string;
     modificationDate?: any;
     warningRequestDuplication?: boolean;
+    viewPosition?: number;
 }
 
 export type Dispatch = (action: Action) => void;

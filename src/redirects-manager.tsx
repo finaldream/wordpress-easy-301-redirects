@@ -35,6 +35,7 @@ export class MountRedirectsManager extends React.Component<RedirectsManagerProps
             lastModification: null,
             lastSave: null,
             perPage: 25,
+            currentPage: 1,
         }
     };
 

@@ -27,6 +27,7 @@ export const Redirection = ( {redirection, dispatch}: RedirectionComponentProps 
     );
     return (
         <tr>
+            <td style={{verticalAlign: 'middle'}}>{redirection.viewPosition}</td>
             <td>
                 <Input
                     type="text"

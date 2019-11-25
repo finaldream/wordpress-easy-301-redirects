@@ -51,11 +51,12 @@ export const ListRedirections: React.FunctionComponent<ListRedirectionsProps> = 
         <table className="widefat" id="view" style={{width: '100%'}}>
             <thead>
                 <tr>
+                    <th style={{width: '1%'}} >#</th>
                     <th style={{width: '40%'}} >Request</th>
                     <th style={{width: '2%'}} ></th>
                     <th style={{width: '40%'}} >Destination</th>
                     <ColumnSorter
-                        columnStyle={{width: '13%'}}
+                        columnStyle={{width: '12%'}}
                         orderBy={orderBy}
                         name="Last Modification"
                         dispatch={dispatch}
@@ -65,8 +66,11 @@ export const ListRedirections: React.FunctionComponent<ListRedirectionsProps> = 
             </thead>
             <tbody>
                 {
-                view.map((redirection) => {
-                    return <Redirection key={redirection.id} redirection={redirection} dispatch={dispatch} />;
+                view.map((redirection, index) => {
+                    return <Redirection
+                        key={redirection.id}
+                        redirection={redirection}
+                        dispatch={dispatch}/>;
                 })
                 }
             </tbody>

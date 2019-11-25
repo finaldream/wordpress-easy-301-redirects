@@ -49,13 +49,14 @@ export const Paginator = ({
     currentPage,
     dispatch }: PaginatorComponentProps) => {
     const filteredCount = filtered ? `(Current search: ${viewLength})` : '';
+    const listPositionHint = `Viewing from: ${(perPage * currentPage) - (perPage - 1 )} to ${Math.min(perPage * currentPage, viewLength)}`;
     return (
         <table className="widefat" id="paginator" style={{width: '100%'}}>
             <tbody>
             <tr>
                 <th>
                     <div className="alignleft actions" style={{display: 'flex', marginTop: '15px'}}>
-                        Redirects: {redirectsLength} { filteredCount }
+                        Redirects: {redirectsLength} { filteredCount } - { listPositionHint }
                         <PerPageSelector perPage={perPage} dispatch={dispatch} />
                     </div>
                     <div className="alignright actions" style={{display: 'flex'}}>

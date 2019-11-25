@@ -54,6 +54,9 @@ const filter = (
     }
     view = view.sort((a, b) => sortByMultipleProperties(a, b, [orderby, 'order']));
     if (sort === 'desc') { view.reverse(); }
+    view.forEach((redirection, index) => {
+        redirection.viewPosition = index + 1;
+    });
     return view;
 };
 
