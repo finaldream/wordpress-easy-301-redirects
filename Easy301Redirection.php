@@ -3,14 +3,13 @@
 namespace WordpressEasy301Redirects;
 
 use DateTime;
-use Serializable;
 use JsonSerializable;
 
 /**
  * EasyRedirection Object for Easy301Redirects
  *
  */
-class EasyRedirection implements Serializable, JsonSerializable
+class Easy301Redirection implements JsonSerializable
 {
     /** @var string $uuid */
     public $id;
@@ -19,53 +18,41 @@ class EasyRedirection implements Serializable, JsonSerializable
     /** @var string $destination */
     private $destination;
     /** @var DateTime $createdAt */
-    private $createdAt;
+    private $creationDate;
     /** @var DateTime $modifiedAt */
-    private $modifiedAt;
+    private $modificationDate;
     /** @var int $order */
     private $order;
 
-    public function __construct(string $request, string $destination, string $uuid = '', int $order = 0, DateTime $createdAt = null) {       
+    public function __construct(string $request = '', string $destination = '', string $uuid = '', int $order = 0, DateTime $createdAt = null) {       
         $this->id = $uuid;
         $this->request = trim( sanitize_text_field($request) );
         $this->destination = trim( sanitize_text_field($destination) );
         $this->order = $order;
-        $this->createdAt = $createdAt ?? new DateTime();        
-    }
-
-    public function serialize() : string
-    {
-        $arr = [
-            'id' => $this->id,
-            'request' => $this->request,
-            'destination' => $this->destination,
-            'order' => $this->order,
-            'creation_date' => $this->createdAt->format(DateTime::ISO8601),
-        ];
-        if ( $this->modifiedAt ) $arr['modified_date'] = $this->modifiedAt->format(DateTime::ISO8601);
-        return serialize($arr);
+        $this->creationDate = $createdAt ?? new DateTime();        
     }
 
     public function jsonSerialize()
     {
         return [
-            'id' => $this->id,
-            'request' => $this->request,
-            'destination' => $this->destination,
+            'id' => $this->getId(),
+            'request' => $this->getRequest(),
+            'destination' => $this->getDestination(),
+            'creationDate' => $this->getCreationDate()->format('m-d-y H:i:s'),
             'modificationDate' => $this->getModificationDate()->format('m-d-y H:i:s'),
-            'order' => $this->order,           
+            'order' => $this->getOrder(),           
         ];
     }
 
-    public function unserialize($data) : EasyRedirection
+    public function jsonDecode(string $data) : Easy301Redirection
     {
-        $arr = unserialize($data);
-        $this->id = $arr['id'];
-        $this->request = $arr['request'];
-        $this->destination = $arr['destination'];
-        $this->order = $arr['order'];
-        $this->createdAt = array_key_exists('creation_date', $arr) ? DateTime::createFromFormat(DateTime::ISO8601, $arr['creation_date']) : new DateTime();
-        $this->modifiedAt = array_key_exists('modified_date', $arr) ? DateTime::createFromFormat(DateTime::ISO8601, $arr['modified_date']) : null;
+        $obj = json_decode($data);
+        $this->id = $obj->id;
+        $this->request =  $obj->request;
+        $this->destination =  $obj->destination;
+        $this->order = $obj->order;
+        $this->creationDate = $obj->creationDate ? DateTime::createFromFormat('m-d-y H:i:s', $obj->creationDate) : new DateTime();
+        $this->modificationDate = $obj->modificationDate  ? DateTime::createFromFormat('m-d-y H:i:s', $obj->modificationDate ) : null;
         return $this;
     }
 
@@ -89,7 +76,7 @@ class EasyRedirection implements Serializable, JsonSerializable
         $request = trim( sanitize_text_field($request) );
         if ($request !== $this->request) {
             $this->request = $request;
-            $this->modifiedAt = new DateTime();
+            $this->modificationDate = new DateTime();
             return true;
         }
         return false;
@@ -105,7 +92,7 @@ class EasyRedirection implements Serializable, JsonSerializable
         $destination = trim( sanitize_text_field($destination) );
         if ($destination !== $this->destination) {
             $this->destination = $destination;
-            $this->modifiedAt = new DateTime();
+            $this->modificationDate = new DateTime();
             return true;
         }
         return false;
@@ -113,22 +100,11 @@ class EasyRedirection implements Serializable, JsonSerializable
 
     public function getCreationDate() : DateTime
     {
-        return $this->createdAt;
+        return $this->creationDate;
     }
 
     public function getModificationDate() : DateTime
     {
-        return $this->modifiedAt ?? $this->createdAt;
-    }
-
-    public function getCSVrow () : array
-    {
-        $row = [
-            trim( sanitize_text_field($this->request )), 
-            trim( sanitize_text_field($this->destination)), 
-            $this->createdAt->format('Y-m-d H:i:s'),            
-            $this->getModificationDate()->format('Y-m-d H:i:s'),
-        ];
-        return $row;
+        return $this->modificationDate ?? $this->creationDate;
     }
 }

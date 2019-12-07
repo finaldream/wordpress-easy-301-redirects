@@ -1,10 +1,12 @@
 const path = require('path');
+const TerserPlugin = require('terser-webpack-plugin');
+
 
 module.exports = {
-    mode: "development",
+    mode: process.env.NODE_ENV || "development",
 
     // Enable sourcemaps for debugging webpack's output.
-    devtool: "source-map",
+    devtool: (process.env.NODE_ENV !== "development") ? "source-map" : false,
 
     resolve: {
         // Add '.ts' and '.tsx' as resolvable extensions.
@@ -38,5 +40,23 @@ module.exports = {
                 loader: "source-map-loader"
             }
         ]
-    }
+    },
+
+    optimization: {
+        minimize: (!process.env.NODE_ENV || process.env.NODE_ENV === "development") ? false : true,
+        minimizer: [
+            new TerserPlugin({
+                include: /\.js$/,
+                extractComments: false,
+                terserOptions: {
+                    compress: {
+                        warnings: false,
+                    },
+                    output: {
+                        comments: false,
+                    },
+                },
+            }),
+        ],
+    },
 };
