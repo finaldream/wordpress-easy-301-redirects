@@ -62,4 +62,4 @@ typings/
 .next
 
 # js files from build
-includes/js
+# includes/js
