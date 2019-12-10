@@ -130,6 +130,15 @@ class Easy301RedirectsPlugin {
                 }
             }
             update_option('easy_301_redirects', $result);
+
+            // Backup and delete SimpleRedirects options on first save
+            if (get_option('301_redirects')) {
+                update_option('301_redirects_backup', get_option('301_redirects'));
+                update_option('301_redirects_wildcard_backup', get_option('301_redirects_wildcard'));
+                delete_option('301_redirects');
+                delete_option('301_redirects_wildcard');
+            }
+
         } catch (\Throwable $th) {
             wp_send_json_error( $th->getMessage(), 500 );
         }
