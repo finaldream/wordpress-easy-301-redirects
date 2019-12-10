@@ -3,7 +3,7 @@
     "description": "Modern and Easy 301 redirects for Wordpress. Intend to replace Simple 301 Redirects",
     "type": "wordpress-plugin",
     "license": "MIT",
-    "version": "1.0.0",
+    "version": "1.0.1",
     "keywords": ["redirection", "301"],
     "readme": "/README.md",
     "homepage": "https://github.com/finaldream/wordpress-easy-301-redirects",
