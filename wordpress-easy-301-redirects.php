@@ -3,7 +3,7 @@
 Plugin Name: Wordpress Easy 301 Redirects
 Plugin URI: https://github.com/finaldream/wordpress-easy-301-redirects
 Description: Create a list of URLs that you would like to 301 redirect to another page or site. Wildcard support is always enabled.
-Version: 1.0.0
+Version: 1.0.2
 Author: Finaldream.de
 Author URI: https://www.finaldream.de
 */
@@ -20,13 +20,19 @@ class Easy301RedirectsPlugin {
     public function __construct()
     {
         add_action('init', array($this,'redirect'), 1);
-        add_action('admin_enqueue_scripts', [ $this, 'loadReactRedirectManager' ]);
         add_action('admin_menu', [ $this, 'initAdminSettings' ] );
         add_action('wp_ajax_saveRedirects', [$this,'saveRedirects'] );
     }
 
     public function initAdminSettings() {
-        add_options_page('Easy 301 Redirects', 'Easy 301 Redirects', 'manage_options', 'easy301options', [$this,'displaySettingsPage']);
+        $settingsPage = add_options_page('Easy 301 Redirects', 'Easy 301 Redirects', 'manage_options', 'easy301options', [$this,'displaySettingsPage']);
+
+        add_action('admin_enqueue_scripts', function ($hook) use ($settingsPage){
+            if($hook !== $settingsPage){
+                return;
+            }
+            $this->loadReactRedirectManager();
+        });
     }
 
     public function loadReactRedirectManager() {
