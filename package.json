@@ -1,6 +1,5 @@
 {
     "name": "wordpress-easy-301-redirects",
-    "version": "1.0.2",
     "description": "Frontend component for wordpress-easy-301-redirects",
     "scripts": {
         "build": "webpack",
