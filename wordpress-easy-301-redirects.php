@@ -25,7 +25,7 @@ class Easy301RedirectsPlugin {
     }
 
     public function initAdminSettings() {
-        $settingsPage = add_options_page('Easy 301 Redirects', 'Easy 301 Redirects', 'manage_options', 'easy301options', [$this,'displaySettingsPage']);
+        $settingsPage = add_management_page('Easy 301 Redirects', 'Easy 301 Redirects', 'manage_options', 'easy301options', [$this,'displaySettingsPage']);
 
         add_action('admin_enqueue_scripts', function ($hook) use ($settingsPage){
             if($hook !== $settingsPage){
