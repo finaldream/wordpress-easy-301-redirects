@@ -8,7 +8,7 @@
         "lint": "tslint -c ./tslint.json -p ./tsconfig.json"
     },
     "dependencies": {
-        "lodash": "^4.17.15",
+        "lodash": "^4.17.19",
         "mount-component": "^1.3.0",
         "react": "^16.11.*",
         "react-csv": "^1.1.2",
