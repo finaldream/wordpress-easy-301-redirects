@@ -3,7 +3,7 @@
 Plugin Name: Wordpress Easy 301 Redirects
 Plugin URI: https://github.com/finaldream/wordpress-easy-301-redirects
 Description: Create a list of URLs that you would like to 301 redirect to another page or site. Wildcard support is always enabled.
-Version: 1.0.5
+Version: 1.0.6
 Author: Finaldream.de
 Author URI: https://www.finaldream.de
 */
