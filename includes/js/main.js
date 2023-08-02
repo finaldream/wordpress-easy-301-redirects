@@ -90170,7 +90170,7 @@ exports.Redirection = ({ redirection, dispatch }) => {
             'not saved' :
             redirection.modificationDate === null || typeof redirection.modificationDate === 'undefined' ?
                 'not saved' :
-                `${redirection.modificationDate.toLocaleDateString(undefined, { year: 'numeric', month: 'numeric', day: 'numeric' })} ${redirection.modificationDate.toLocaleTimeString(undefined, { hour: '2-digit', minute: '2-digit' })}`),
+                `${redirection.modificationDate.toLocaleDateString(undefined, { year: 'numeric', month: 'short', day: '2-digit' })} ${redirection.modificationDate.toLocaleTimeString(undefined, { hour: '2-digit', minute: '2-digit', hour12: false })}`),
         React.createElement("td", null,
             React.createElement("a", { className: "button", onClick: () => dispatch({ type: 'remove', value: redirection }) }, "Delete"))));
 };
