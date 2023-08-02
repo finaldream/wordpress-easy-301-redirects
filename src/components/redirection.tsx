@@ -46,7 +46,12 @@ export const Redirection = ( {redirection, dispatch}: RedirectionComponentProps 
                     onChange={(e) => handleEdition(e)}
                 />
             </td>
-            <td>{redirection.modificationDate}</td>
+            <td>{ typeof redirection.modificationDate === 'string' ?
+                    'not saved' :
+                    redirection.modificationDate === null || typeof redirection.modificationDate === 'undefined' ?
+                        'not saved' :
+                        `${redirection.modificationDate.toLocaleDateString(undefined, {year: 'numeric', month: 'numeric', day: 'numeric'})} ${redirection.modificationDate.toLocaleTimeString(undefined, {hour: '2-digit', minute: '2-digit'})}`
+                }</td>
             <td>
             <a className="button" onClick={() => dispatch({type: 'remove', value: redirection})} >
                 Delete

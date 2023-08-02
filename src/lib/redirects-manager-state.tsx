@@ -17,7 +17,7 @@ export interface RedirectionProps {
     id: string;
     request?: string;
     destination?: string;
-    modificationDate?: any;
+    modificationDate?: Date | string;
     warningRequestDuplication?: boolean;
     viewPosition?: number;
 }
@@ -51,8 +51,13 @@ export const redirectsManagerReducer: RedirectsManagerReducerType = (state, acti
 
         case 'add': {
             const newState = {...state};
-            newState.redirects.push({id: v4(), modificationDate: 'not saved'});
+            const newRedirect = {id: v4(), modificationDate: null, request: '', destination: ''};
+            console.log('newRedirect', newRedirect);
+            newState.redirects.reverse()
+            newState.redirects.push(newRedirect);
+            newState.redirects.reverse()
             newState.currentPage = 1;
+            newState.orderBy = '-modificationDate';
             return newState;
         }
 

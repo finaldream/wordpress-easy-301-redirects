@@ -5,7 +5,7 @@ import 'react-toastify/dist/ReactToastify.min.css';
 
 import { RedirectsManagerStateInterface, redirectsManagerReducer, } from './lib/redirects-manager-state';
 
-import { validateLoad } from './lib/utils';
+import { validateLoad, parseLoad } from './lib/utils';
 
 import { Toolbar } from './components/toolbar';
 
@@ -14,7 +14,7 @@ interface RedirectsManagerProps  {
 }
 
 export const RedirectsManager = ({initialState}: RedirectsManagerProps) => {
-    const [state, dispatch] = React.useReducer(redirectsManagerReducer, initialState);
+    const [state, dispatch] = React.useReducer(redirectsManagerReducer, parseLoad(initialState));
     return (
         <div>
             <Toolbar dispatch={dispatch} state={state} />
