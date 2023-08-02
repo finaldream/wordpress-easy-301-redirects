@@ -19,21 +19,29 @@ interface ColumnSorterProps {
 }
 
 const ColumnSorter = ({orderBy, name, field, dispatch, columnStyle}: ColumnSorterProps) => {
-    let classes: string;
-    let indicator: React.ReactNode;
-    let newValue: string;
+    let classes: string = 'manage-column sortable';
+    let indicator: React.ReactNode = null;
+    let newValue: string = '';
     if (orderBy === '') {
-        classes = 'manage-column sorted';
+        classes = 'manage-column sortable';
         indicator = null;
         newValue = `-${field}`;
-    } else if (orderBy[0] === '-') {
-        classes = 'manage-column column-modified sorted asc';
-        indicator = <span className="sorting-indicator"></span>;
-        newValue = field;
-    } else {
+    } else if (orderBy[0] === '-' && orderBy.slice(1) === field) {
         classes = 'manage-column column-modified sorted desc';
         indicator = <span className="sorting-indicator"></span>;
-        newValue = '';
+        newValue = field;
+    } else if (orderBy[0] !== '-' && orderBy === field) {
+        classes = 'manage-column column-modified sorted asc';
+        indicator = <span className="sorting-indicator"></span>;
+        newValue = '-modificationDate';
+    } else if (orderBy[0] !== '-' && orderBy !== field) {
+        classes = 'manage-column column-modified sortable';
+        indicator = null;
+        newValue = `-${field}`;
+    } else if (orderBy[0] === '-' && orderBy.slice(1) !== field) {
+        classes = 'manage-column column-modified sortable';
+        indicator = null;
+        newValue = `-${field}`;
     }
     return (
         <th style={columnStyle} className={classes} >
@@ -52,9 +60,19 @@ export const ListRedirections: React.FunctionComponent<ListRedirectionsProps> = 
             <thead>
                 <tr>
                     <th style={{width: '1%'}} >#</th>
-                    <th style={{width: '40%'}} >Request</th>
+                    <ColumnSorter
+                        columnStyle={{width: '40%'}}
+                        orderBy={orderBy}
+                        name="Request"
+                        dispatch={dispatch}
+                        field="request" />
                     <th style={{width: '2%'}} ></th>
-                    <th style={{width: '40%'}} >Destination</th>
+                    <ColumnSorter
+                        columnStyle={{width: '40%'}}
+                        orderBy={orderBy}
+                        name="Destination"
+                        dispatch={dispatch}
+                        field="destination" />
                     <ColumnSorter
                         columnStyle={{width: '12%'}}
                         orderBy={orderBy}
@@ -66,11 +84,12 @@ export const ListRedirections: React.FunctionComponent<ListRedirectionsProps> = 
             </thead>
             <tbody>
                 {
-                view.map((redirection, index) => {
+                view.map((redirection) => {
                     return <Redirection
-                        key={redirection.id}
-                        redirection={redirection}
-                        dispatch={dispatch}/>;
+                                key={redirection.id}
+                                redirection={redirection}
+                                dispatch={dispatch}
+                            />
                 })
                 }
             </tbody>
