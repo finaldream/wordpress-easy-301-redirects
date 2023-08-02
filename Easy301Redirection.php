@@ -3,6 +3,7 @@
 namespace WordpressEasy301Redirects;
 
 use DateTime;
+use DateTimeZone;
 use JsonSerializable;
 
 /**
@@ -38,22 +39,33 @@ class Easy301Redirection implements JsonSerializable
             'id' => $this->getId(),
             'request' => $this->getRequest(),
             'destination' => $this->getDestination(),
-            'creationDate' => $this->getCreationDate()->format('m-d-y H:i:s'),
-            'modificationDate' => $this->getModificationDate()->format('m-d-y H:i:s'),
+            'creationDate' => $this->getCreationDate()->format(DATE_ATOM),
+            'modificationDate' => $this->getModificationDate()->format(DATE_ATOM),
             'order' => $this->getOrder(),           
         ];
     }
 
     public function jsonDecode(string $data) : Easy301Redirection
     {
+        $tz = new DateTimeZone('UTC');
         $obj = json_decode($data);
         $this->id = $obj->id;
         $this->request =  $obj->request;
         $this->destination =  $obj->destination;
         $this->order = $obj->order;
-        $this->creationDate = $obj->creationDate ? DateTime::createFromFormat('m-d-y H:i:s', $obj->creationDate) : new DateTime();
-        $this->modificationDate = $obj->modificationDate  ? DateTime::createFromFormat('m-d-y H:i:s', $obj->modificationDate ) : null;
+        $this->creationDate = $obj->creationDate ? $this->parseDates($obj->creationDate) : new DateTime('now', $tz);
+        $this->modificationDate = $obj->modificationDate  ? $this->parseDates($obj->modificationDate) : null;
         return $this;
+    }
+
+    protected function parseDates(string $string) : DateTime
+    {
+        $tz = new DateTimeZone('UTC');
+        $date = DateTime::createFromFormat(DATE_ATOM, $string, $tz);
+        if ($date === false) {
+            $date = DateTime::createFromFormat('m-d-y H:i:s', $string, $tz);
+        }
+        return $date;
     }
 
     public function getId() : string
@@ -100,7 +112,7 @@ class Easy301Redirection implements JsonSerializable
 
     public function getCreationDate() : DateTime
     {
-        return $this->creationDate;
+        return $this->creationDate ?? new DateTime();
     }
 
     public function getModificationDate() : DateTime

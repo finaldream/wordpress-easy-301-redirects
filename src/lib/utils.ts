@@ -18,7 +18,7 @@ export const validateLoad = (state: RedirectsManagerStateInterface) => {
     state.redirects = state.redirects.map((redirection) => {
         if (!redirection.id || redirection.id === '') {
             redirection.id = v4();
-            redirection.modificationDate = 'not saved';
+            redirection.modificationDate = null;
             valid = false;
         }
         return redirection;
@@ -44,7 +44,7 @@ export const saveState = async (state: RedirectsManagerStateInterface) => {
     try {
         result = await fetch(ajaxUrl + '?action=saveRedirects', init);
     } catch (e) {
-        this.showNotification('error', 'An Error ocurred! Changes not saved');
+        showNotification('error', 'An Error ocurred! Changes not saved');
         throw e;
     }
     if (result.ok) {
@@ -73,7 +73,7 @@ export const saveState = async (state: RedirectsManagerStateInterface) => {
             showNotification('success', notificationMsg);
         }
         const final: RedirectsManagerStateInterface = {...state, redirects: json.data.redirects};
-        return validateLoad(final);
+        return parseLoad(validateLoad(final));
     } else {
         showNotification('error', 'An Error ocurred! Changes not saved');
         throw new Error(result.statusText);
@@ -84,7 +84,7 @@ export const sortByProperty = (a: {}, b: {}, property: string) => {
     let sortOrder: -1|1 = 1;
     if (property[0] === '-') {
         sortOrder = -1;
-        property = property.substr(1);
+        property = property.slice(1);
     }
     if (!a[property] || !b[property] ) { return 0; }
     return ( (a[property] < b[property]) ? -1 : (a[property] > b[property]) ? 1 : 0 ) * sortOrder;
@@ -108,4 +108,12 @@ export const checkRepeatedRequests = (state: RedirectsManagerStateInterface) => 
     }, [] );
     state.redirects.map( (el) => el.warningRequestDuplication = repeatedRequest.includes(el.request));
     return state;
+};
+
+export const parseLoad = (state: RedirectsManagerStateInterface) => {
+    const parsedRedirects =  state.redirects.map((r) => {
+        const modificationDate = typeof r.modificationDate === 'string' ? new Date(r.modificationDate) : r.modificationDate;
+        return { ...r, modificationDate };
+    });
+    return {...state, redirects: parsedRedirects}
 };

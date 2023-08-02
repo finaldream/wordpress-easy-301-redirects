@@ -90005,23 +90005,33 @@ Object.defineProperty(exports, "__esModule", { value: true });
 const React = __importStar(__webpack_require__(/*! react */ "./node_modules/react/index.js"));
 const redirection_1 = __webpack_require__(/*! ./redirection */ "./src/components/redirection.tsx");
 const ColumnSorter = ({ orderBy, name, field, dispatch, columnStyle }) => {
-    let classes;
-    let indicator;
-    let newValue;
+    let classes = 'manage-column sortable';
+    let indicator = null;
+    let newValue = '';
     if (orderBy === '') {
-        classes = 'manage-column sorted';
+        classes = 'manage-column sortable';
         indicator = null;
         newValue = `-${field}`;
     }
-    else if (orderBy[0] === '-') {
-        classes = 'manage-column column-modified sorted asc';
+    else if (orderBy[0] === '-' && orderBy.slice(1) === field) {
+        classes = 'manage-column column-modified sorted desc';
         indicator = React.createElement("span", { className: "sorting-indicator" });
         newValue = field;
     }
-    else {
-        classes = 'manage-column column-modified sorted desc';
+    else if (orderBy[0] !== '-' && orderBy === field) {
+        classes = 'manage-column column-modified sorted asc';
         indicator = React.createElement("span", { className: "sorting-indicator" });
-        newValue = '';
+        newValue = '-modificationDate';
+    }
+    else if (orderBy[0] !== '-' && orderBy !== field) {
+        classes = 'manage-column column-modified sortable';
+        indicator = null;
+        newValue = `-${field}`;
+    }
+    else if (orderBy[0] === '-' && orderBy.slice(1) !== field) {
+        classes = 'manage-column column-modified sortable';
+        indicator = null;
+        newValue = `-${field}`;
     }
     return (React.createElement("th", { style: columnStyle, className: classes },
         React.createElement("a", { onClick: () => dispatch({ type: 'set', value: { orderBy: newValue } }) },
@@ -90033,12 +90043,12 @@ exports.ListRedirections = ({ view, orderBy, dispatch }) => {
         React.createElement("thead", null,
             React.createElement("tr", null,
                 React.createElement("th", { style: { width: '1%' } }, "#"),
-                React.createElement("th", { style: { width: '40%' } }, "Request"),
+                React.createElement(ColumnSorter, { columnStyle: { width: '40%' }, orderBy: orderBy, name: "Request", dispatch: dispatch, field: "request" }),
                 React.createElement("th", { style: { width: '2%' } }),
-                React.createElement("th", { style: { width: '40%' } }, "Destination"),
+                React.createElement(ColumnSorter, { columnStyle: { width: '40%' }, orderBy: orderBy, name: "Destination", dispatch: dispatch, field: "destination" }),
                 React.createElement(ColumnSorter, { columnStyle: { width: '12%' }, orderBy: orderBy, name: "Last Modification", dispatch: dispatch, field: "modificationDate" }),
                 React.createElement("th", { style: { width: '5%', textAlign: 'center' } }, "Action"))),
-        React.createElement("tbody", null, view.map((redirection, index) => {
+        React.createElement("tbody", null, view.map((redirection) => {
             return React.createElement(redirection_1.Redirection, { key: redirection.id, redirection: redirection, dispatch: dispatch });
         }))));
 };
@@ -90156,7 +90166,11 @@ exports.Redirection = ({ redirection, dispatch }) => {
         React.createElement("td", null, "\u00BB"),
         React.createElement("td", null,
             React.createElement(Input, { type: "text", name: "destination", defaultValue: redirection.destination, onChange: (e) => handleEdition(e) })),
-        React.createElement("td", null, redirection.modificationDate),
+        React.createElement("td", null, typeof redirection.modificationDate === 'string' ?
+            'not saved' :
+            redirection.modificationDate === null || typeof redirection.modificationDate === 'undefined' ?
+                'not saved' :
+                `${redirection.modificationDate.toLocaleDateString(undefined, { year: 'numeric', month: 'short', day: '2-digit' })} ${redirection.modificationDate.toLocaleTimeString(undefined, { hour: '2-digit', minute: '2-digit', hour12: false })}`),
         React.createElement("td", null,
             React.createElement("a", { className: "button", onClick: () => dispatch({ type: 'remove', value: redirection }) }, "Delete"))));
 };
@@ -90324,8 +90338,13 @@ exports.redirectsManagerReducer = (state, action) => {
     switch (action.type) {
         case 'add': {
             const newState = Object.assign({}, state);
-            newState.redirects.push({ id: uuid_1.v4(), modificationDate: 'not saved' });
+            const newRedirect = { id: uuid_1.v4(), modificationDate: null, request: '', destination: '' };
+            console.log('newRedirect', newRedirect);
+            newState.redirects.reverse();
+            newState.redirects.push(newRedirect);
+            newState.redirects.reverse();
             newState.currentPage = 1;
+            newState.orderBy = '-modificationDate';
             return newState;
         }
         case 'edit': {
@@ -90395,7 +90414,7 @@ exports.validateLoad = (state) => {
     state.redirects = state.redirects.map((redirection) => {
         if (!redirection.id || redirection.id === '') {
             redirection.id = uuid_1.v4();
-            redirection.modificationDate = 'not saved';
+            redirection.modificationDate = null;
             valid = false;
         }
         return redirection;
@@ -90421,7 +90440,7 @@ exports.saveState = (state) => __awaiter(void 0, void 0, void 0, function* () {
         result = yield fetch(ajaxUrl + '?action=saveRedirects', init);
     }
     catch (e) {
-        this.showNotification('error', 'An Error ocurred! Changes not saved');
+        exports.showNotification('error', 'An Error ocurred! Changes not saved');
         throw e;
     }
     if (result.ok) {
@@ -90447,7 +90466,7 @@ exports.saveState = (state) => __awaiter(void 0, void 0, void 0, function* () {
             exports.showNotification('success', notificationMsg);
         }
         const final = Object.assign(Object.assign({}, state), { redirects: json.data.redirects });
-        return exports.validateLoad(final);
+        return exports.parseLoad(exports.validateLoad(final));
     }
     else {
         exports.showNotification('error', 'An Error ocurred! Changes not saved');
@@ -90458,7 +90477,7 @@ exports.sortByProperty = (a, b, property) => {
     let sortOrder = 1;
     if (property[0] === '-') {
         sortOrder = -1;
-        property = property.substr(1);
+        property = property.slice(1);
     }
     if (!a[property] || !b[property]) {
         return 0;
@@ -90483,6 +90502,13 @@ exports.checkRepeatedRequests = (state) => {
     }, []);
     state.redirects.map((el) => el.warningRequestDuplication = repeatedRequest.includes(el.request));
     return state;
+};
+exports.parseLoad = (state) => {
+    const parsedRedirects = state.redirects.map((r) => {
+        const modificationDate = typeof r.modificationDate === 'string' ? new Date(r.modificationDate) : r.modificationDate;
+        return Object.assign(Object.assign({}, r), { modificationDate });
+    });
+    return Object.assign(Object.assign({}, state), { redirects: parsedRedirects });
 };
 
 
@@ -90513,7 +90539,7 @@ const redirects_manager_state_1 = __webpack_require__(/*! ./lib/redirects-manage
 const utils_1 = __webpack_require__(/*! ./lib/utils */ "./src/lib/utils.ts");
 const toolbar_1 = __webpack_require__(/*! ./components/toolbar */ "./src/components/toolbar.tsx");
 exports.RedirectsManager = ({ initialState }) => {
-    const [state, dispatch] = React.useReducer(redirects_manager_state_1.redirectsManagerReducer, initialState);
+    const [state, dispatch] = React.useReducer(redirects_manager_state_1.redirectsManagerReducer, utils_1.parseLoad(initialState));
     return (React.createElement("div", null,
         React.createElement(toolbar_1.Toolbar, { dispatch: dispatch, state: state }),
         React.createElement(react_toastify_1.ToastContainer, { position: "bottom-right" })));
