@@ -50,7 +50,7 @@ export const Redirection = ( {redirection, dispatch}: RedirectionComponentProps 
                     'not saved' :
                     redirection.modificationDate === null || typeof redirection.modificationDate === 'undefined' ?
                         'not saved' :
-                        `${redirection.modificationDate.toLocaleDateString(undefined, {year: 'numeric', month: 'numeric', day: 'numeric'})} ${redirection.modificationDate.toLocaleTimeString(undefined, {hour: '2-digit', minute: '2-digit'})}`
+                        `${redirection.modificationDate.toLocaleDateString(undefined, {year: 'numeric', month: 'short', day: '2-digit'})} ${redirection.modificationDate.toLocaleTimeString(undefined, {hour: '2-digit', minute: '2-digit',  hour12: false})}`
                 }</td>
             <td>
             <a className="button" onClick={() => dispatch({type: 'remove', value: redirection})} >

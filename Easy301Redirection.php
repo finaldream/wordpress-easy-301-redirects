@@ -53,9 +53,19 @@ class Easy301Redirection implements JsonSerializable
         $this->request =  $obj->request;
         $this->destination =  $obj->destination;
         $this->order = $obj->order;
-        $this->creationDate = $obj->creationDate ? DateTime::createFromFormat(DATE_ATOM, $obj->creationDate, $tz) : new DateTime('now', $tz);
-        $this->modificationDate = $obj->modificationDate  ? DateTime::createFromFormat(DATE_ATOM, $obj->modificationDate, $tz) : null;
+        $this->creationDate = $obj->creationDate ? $this->parseDates($obj->creationDate) : new DateTime('now', $tz);
+        $this->modificationDate = $obj->modificationDate  ? $this->parseDates($obj->modificationDate) : null;
         return $this;
+    }
+
+    protected function parseDates(string $string) : DateTime
+    {
+        $tz = new DateTimeZone('UTC');
+        $date = DateTime::createFromFormat(DATE_ATOM, $string, $tz);
+        if ($date === false) {
+            $date = DateTime::createFromFormat('m-d-y H:i:s', $string, $tz);
+        }
+        return $date;
     }
 
     public function getId() : string
@@ -102,7 +112,7 @@ class Easy301Redirection implements JsonSerializable
 
     public function getCreationDate() : DateTime
     {
-        return $this->creationDate;
+        return $this->creationDate ?? new DateTime();
     }
 
     public function getModificationDate() : DateTime
